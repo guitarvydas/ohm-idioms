@@ -1,0 +1,3 @@
+main [@stuff1 code @stuff2] = [[${stuff1}${code}${stuff2}]]
+code_nested [klbrace @code krbrace] = [[${klbrace}${code}${krbrace}]]
+stuff [c] = [[${c}]]

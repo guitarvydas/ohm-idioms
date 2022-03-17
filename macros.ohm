@@ -1,0 +1,14 @@
+macro {
+lotsofstuff = stuff*
+stuff
+  = applySyntactic<Macro>
+  | macroName
+  | anychar
+  
+Macro
+  = macroName
+
+macroName = "fxyz"
+
+anychar = ~macroName any
+}

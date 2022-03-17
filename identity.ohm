@@ -1,0 +1,8 @@
+embeddedCode {
+main = stuff* code stuff*
+code 
+  = "{" code* "}" -- nested
+  | stuff         -- flat
+stuff = ~"{" ~"}" any
+}
+

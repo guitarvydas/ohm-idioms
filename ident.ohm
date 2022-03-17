@@ -1,0 +1,6 @@
+ident {
+main = ident
+ident = identFirst identRest*
+identFirst = letter
+identRest = digit | identFirst
+}

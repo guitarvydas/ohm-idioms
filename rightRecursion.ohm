@@ -1,0 +1,5 @@
+rightRecursion {
+  Main = Pair
+  Pair = letter Pair
+       | letter letter
+}

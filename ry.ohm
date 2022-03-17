@@ -1,0 +1,7 @@
+repeatyourself {
+Main = Word*
+Word = W1 W2*
+W1 = word
+W2 = word
+word = letter+
+}
