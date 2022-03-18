@@ -1,3 +1,2 @@
-main [@stuff1 code @stuff2] = [[${stuff1}${code}${stuff2}]]
-code_nested [klbrace @code krbrace] = [[(${code})]]
-stuff [c] = [[${c}]]
+Main [P] = [[${P}]]
+Pair [a b] = [[(${b} - ${a})]]

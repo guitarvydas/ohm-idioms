@@ -1,0 +1,8 @@
+Main [e] = [[def f ():\n    return ${e}\nprint (f ())]]
+Expr [a] = [[${a}]]
+Additive_op [e op p] = [[${e}${op}${p}]]
+Additive_single [p] = [[${p}]]
+Operator_add [op] = [[+]]
+Operator_subtract [op] = [[-]]
+Primary_nested [lpar e rpar] = [[(${e})]]
+Primary_basic [@ds] = [[${ds}]]

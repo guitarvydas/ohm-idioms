@@ -1,0 +1,14 @@
+simplemath {
+  Main = Expr
+  Expr
+    = Additive
+  Additive
+    = Expr Operator Primary -- op
+    | Primary               -- single
+  Operator
+    = "+" -- add
+    | "-" -- subtract
+  Primary 
+    = "(" Expr ")" -- nested
+    | digit+       -- basic
+}
