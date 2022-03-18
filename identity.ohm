@@ -1,5 +1,5 @@
 leftRecursion {
-  Main = Pair
-  Pair = Pair alnum
-       | alnum alnum
+  Main = Item
+  Item = Item alnum -- recursive
+       | alnum      -- bottom
 }

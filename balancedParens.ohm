@@ -1,8 +1,7 @@
-embeddedCode {
-main = stuff* code stuff*
-code 
-  = "{" code* "}" -- nested
-  | stuff         -- flat
-stuff = ~"{" ~"}" any
+balancedParens {
+main = inner
+inner
+  = "(" inner* ")" -- nested
+  | stuff          -- flat
+stuff = ~"(" ~")" any
 }
-
