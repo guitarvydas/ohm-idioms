@@ -1,5 +1,6 @@
 rightRecursion {
-  Main = Pair
-  Pair = letter Pair
-       | letter letter
+  Main = Item
+  Item = Primary Item -- recursive
+       | Primary      -- bottom
+  Primary = alnum
 }

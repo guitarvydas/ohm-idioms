@@ -1,16 +1,18 @@
-- idiom for balanced parens
-- idiom for macros (applySyntactic)
-- idiom for right recursion (a(b(c d)))
-- idiom for left recursion (((a b) c) d)))
-- idiom for matching idents vs. keywords
-- idiom for re-using rules (RY instead of DRY), declaration vs. definition
-- idiom for identity matching
-- idiom for math
+The following grammars are for us in the ohm-editor
 
-references
-- ohm github
-- ohm math
-- abc
-- abc glue
-- abc wasm
-- blog (free version)
+- balancedParens.ohm
+- macros.ohm
+- rightRecursion.ohm
+- leftRecursion.ohm
+- ident.ohm
+- ry.ohm
+- nested.ohm
+
+Each of the above grammars has a corresponding .txt test file.
+
+The following are bash scripts that invoke Ohm-JS via the prep tool:
+
+- identity.bash
+- mangle.bash
+- math.bash
+
