@@ -1,10 +1,2 @@
-function jstest () {
-return (function (a) {
-return (function (b) {
-return (function (c) {
-return (a + (b + c));
-});
-});
-})
-}
-console.log (jstest()(3)(4)(5));
+
+print ((lambda a: (lambda b: (lambda c: a + b + c)))(3,4,5))

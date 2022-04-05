@@ -7,7 +7,9 @@ identity-lc:
 	./identity-lc.bash
 
 lc-lisp:
-	./lc-lisp.bash
+	./lc-lisp.bash >lisptest.lisp
+	cat lisptest.lisp
+	sbcl --eval `cat lisptest.lisp`
 
 lc-js:
 	./lc-js.bash >jstest.js

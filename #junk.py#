@@ -1,9 +1,0 @@
-fc = lambda c: c
-fb = lambda b: b
-fa = lambda a: a
-
-def f ():
-    return fa()fb()fc()
-
-print (f())
-

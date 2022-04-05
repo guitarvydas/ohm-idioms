@@ -1,4 +1,4 @@
-Main [lc] = [[${lc}]]
+Main [lc] = [[(((${lc} 5) 4) 3)]]
 Lc_lambda [klambda name kdot e] = [[(lambda (${name}) ${e})]]
 Lc_expr [e] = [[${e}]]
 
