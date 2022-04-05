@@ -1,0 +1,14 @@
+lc {
+Main = Lc
+Lc
+ = "λ" name "." Lc -- lambda
+ | Expression      -- expr
+
+Expression
+  = primary "+" Expression -- op
+  | primary                -- primary
+
+primary = name
+name = letter
+}
+
