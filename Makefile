@@ -1,4 +1,4 @@
-all: identity identity-lc math mangle lc-js lc-lisp
+all: identity identity-lc math mangle lc-py lc-js lc-lisp
 
 identity:
 	./identity.bash
@@ -12,7 +12,12 @@ lc-lisp:
 lc-js:
 	./lc-js.bash >jstest.js
 	cat jstest.js
-	node jstest
+	node jstest.js
+
+lc-py:
+	./lc-py.bash >pytest.py
+	cat pytest.py
+	python3 pytest.py
 
 math:
 	./math.bash
