@@ -110,11 +110,11 @@ spc = " "
   }
 
   function identity () {
-      var [mtchResult, s] = parse ();      
-      s.addOperation ('identity', identity_hooks);
-      let fmt = s (mtchResult).identity ();
-      console.log (fmt.toString ());
-      document.getElementById ('output').innerHTML = fmt.toString ();
+      var [cst, treeWalker] = parse ();      
+      treeWalker.addOperation ('identity', identity_hooks);
+      let result = treeWalker (cst).identity ();
+      console.log (result.toString ());
+      document.getElementById ('output').innerHTML = "pt\n" + result.toString ();
       
       // var [cst, hooks] = parse ();
       // if (cst.succeeded ()) {
