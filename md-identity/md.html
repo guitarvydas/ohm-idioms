@@ -111,21 +111,16 @@ spc = " "
 
   function identity () {
       var [cst, treeMap] = parse ();      
-      treeMap.addOperation ('identity', identity_hooks);
-      let treeWalker = treeMap (cst);
-      // let transpiled = treeWalker ['identity'] ();
-      let transpiled = treeWalker.identity ();
-      console.log (transpiled.toString ());
-      document.getElementById ('output').innerHTML = transpiled.toString ();
-      
-      // var [cst, hooks] = parse ();
-      // if (cst.succeeded ()) {
-      //     hooks.addOperation ('identity', identity_hooks);
-      //     let treeMap = hooks (cst);
-      //     let r = treeMap.identity ();
-      //     document.getElementById ('output').innerHTML = r.toString ();
-      // } else {
-      // }
+      if (cst.succeeded ()) {
+	  treeMap.addOperation ('identity', identity_hooks);
+	  let treeWalker = treeMap (cst);
+	  // let transpiled = treeWalker ['identity'] ();
+	  let transpiled = treeWalker.identity ();
+	  console.log (transpiled.toString ());
+	  document.getElementById ('output').innerHTML = transpiled.toString ();
+      } else {
+	  document.getElementById ('output').innerHTML = 'FAILED';
+      }
   }
   
   </script>
