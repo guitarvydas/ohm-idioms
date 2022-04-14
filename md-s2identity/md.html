@@ -65,13 +65,14 @@ spc = " "
 	  var rtoEOL = toEOL.identity ();
 	  var rlinetail = linetail.identity ();
 	  console.log (`line <- ${parseTreeToString (ri)};${parseTreeToString (rspc)};${parseTreeToString (rtoEOL)};${parseTreeToString (rlinetail)}`);
-	  console.log (`line: [${ri}; ${rspc}; ${rtoEOL};, ${rlinetail}]`);
           return [ri, rspc, rtoEOL, rlinetail];
       },
       linetail_withContent: function (newline, toIndent) {
+	  console.log (`linetail_withContent <- ${parseTreeToString (newline.identity ())};${parseTreeToString (toIndent.identity ())}`);
           return [newline.identity (), toIndent.identity ()];
       },
       linetail_withoutContent: function (newline, end) {
+	  console.log (`linetail_withoutContent <- ${parseTreeToString (newline.identity ())};${parseTreeToString (end.identity ())}`);
           return [newline.identity ()];
       },
       indent: function (indentChar) {
