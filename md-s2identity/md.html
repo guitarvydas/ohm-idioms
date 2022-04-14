@@ -56,8 +56,9 @@ spc = " "
       // all of the underlying details have no typos in
       // them...
       main: function (line) {
-	  console.log (`main <- ${parseTreeToString (line.identity ())}`);
-          return [line.identity ()];
+	  var temp = line.identity ()
+	  console.log (`main <- ${parseTreeToString (temp)}`);
+          return [temp];
       },
       line: function (indent, spc, toEOL, linetail) {
 	  var ri = indent.identity ();
@@ -77,26 +78,38 @@ spc = " "
       },
       indent: function (indentChar) {
 	  var r = indentChar.identity ();
-	  console.log (`indent ${Array.isArray(r)}; ${r.length}; ${r}`);
+	  console.log (`indent <- ${parseTreeToString (r)}`);
           return [r];
       },
       indentChar: function (c) {
           return [c.identity ()];
       },
       toIndent: function (c) {
+	  // console.log (`toIndent <- ${parseTreeToString (c.identity ())}`);
           return [c.identity ()];
       },
       toEOL: function (c) {
-          return [c.identity ()];
+	  var temp = c.identity ();
+	  console.log (`toEOL <- /${temp}/`);
+          return [temp];
       },
       newline: function (c) {
+	  // console.log (`newline <- ${parseTreeToString (c.identity ())}`);
           return [c.identity ()];
       },
       spc: function (c) {
-          return [c.identity ()];
+	  var temp = c.identity ()
+	  console.log (`spc <- /${parseTreeToString (temp)}/`);
+          return [temp];
       },
-      _terminal: function () { return this.sourceString; },
-      _iter: function (...children) { return children.map(c => c.identity ()); }
+      _terminal: function () { 
+	  // console.log (`_terminal <- /${this.sourceString}/`);
+	  return this.sourceString; 
+      },
+      _iter: function (...children) { 
+	  // console.log ('(_iter)', '');
+	  return children.map(c => c.identity ()); 
+      }
   };
 
   function parse () {
