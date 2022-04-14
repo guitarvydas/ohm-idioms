@@ -58,19 +58,19 @@ spc = " "
       // all of the underlying details have no typos in
       // them...
       main: function (line) {
-          return `${line.identity ()}`;
+          return `${line.identity ().join ('')}`;
       },
       line: function (indent, spc, toEOL, linetail) {
-          return `${indent.identity ()}${spc.identity ()}${toEOL.identity ()}${linetail.identity ()}`;
+          return `${indent.identity ().join ('')}${spc.identity ().join ('')}${toEOL.identity ().join ('')}${linetail.identity ()}`;
       },
       linetail_withContent: function (newline, toIndent) {
-          return `${newline.identity ()}${toIndent.identity ()}`;
+          return `${newline.identity ()}${toIndent.identity ().join ('')}`;
       },
       linetail_withoutContent: function (newline, end) {
-          return `${newline.identity ()}`;
+          return `${newline.identity ().join ('')}`;
       },
       indent: function (indentChar) {
-          return `${indentChar.identity ()}`;
+          return `${indentChar.identity ().join ('')}`;
       },
       indentChar: function (c) {
           return `${c.identity ()}`;
@@ -116,7 +116,7 @@ spc = " "
 	  // let transpiled = treeWalker ['identity'] ();
 	  let transpiled = treeWalker.identity ();
 	  console.log (transpiled.toString ());
-	  document.getElementById ('output').innerHTML = 's\n' + transpiled.toString ();
+	  document.getElementById ('output').innerHTML = transpiled.toString ();
       } else {
 	  document.getElementById ('output').innerHTML = 'FAILED';
       }
