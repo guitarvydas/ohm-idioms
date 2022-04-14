@@ -1,0 +1,10 @@
+Main [lc] = [[\nprint (${lc}(3,4,5))]]
+Lc_lambda [klambda name kdot e] = [[(lambda ${name}: ${e})]]
+Lc_expr [e] = [[${e}]]
+
+Expression_op [p kplus e] = [[${p} + ${e}]]
+Expression_primary [p] = [[${p}]]
+
+primary [n] = [[${n}]]
+name [l] = [[${l}]]
+

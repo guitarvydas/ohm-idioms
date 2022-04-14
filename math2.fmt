@@ -1,0 +1,8 @@
+Main [e] = [[${e}]]
+Expr [a] = [[${a}]]
+Additive_op [e op p] = [[${p}${e}${op}]]
+Additive_single [p] = [[${p}]]
+Operator_add [op] = [[f64.add\n]]
+Operator_subtract [op] = [[f64.sub\n]]
+Primary_nested [lpar e rpar] = [[${e}]]
+Primary_basic [@ds] = [[f64.const ${ds}\n]]

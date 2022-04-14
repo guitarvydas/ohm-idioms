@@ -1,0 +1,9 @@
+λa.λb.λc.a+b+c
+
+λa.λb.λc.λ.a+b+c applied-to '(3 4 5)
+λb.λc.λ.3+b+c applied-to '(4 5)
+λc.λ.3+4+c applied-to '(5)
+λ.3+4+5 applied-to '()
+
+λa.λb.λc.a+b+c applied-to '(3 4 5)
+λa.λb.λc.((λ.a)+((λ.b)+(λ.c))) applied-to '(3 4 5)

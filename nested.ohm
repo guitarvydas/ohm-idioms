@@ -1,0 +1,7 @@
+nested {
+main = nested*
+nested
+  = "{" nested* "}" -- nested
+  | stuff          -- flat
+stuff = ~"{" ~"}" any
+}

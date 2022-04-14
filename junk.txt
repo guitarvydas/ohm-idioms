@@ -1,0 +1,13 @@
+λa.λb.λc.a+b+c
+
+(lambda (a b c) 
+	(+ a (+ b c)))
+
+(lambda (c)
+  (lambda (a b) 
+	(+ a (+ b (ev@l c)))))
+
+
+λa.λb.a+b
+
+(lambda (a b) (+ a b))

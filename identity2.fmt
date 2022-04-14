@@ -1,0 +1,3 @@
+Main [P] = [[${P}]]
+Item_recursive [item an] = [[${item} ${an}]]
+Item_bottom [a] = [[${a}]]

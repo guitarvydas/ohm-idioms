@@ -1,0 +1,99 @@
+{
+  "main": {
+    "id": "45a81ba58bdedc49",
+    "type": "split",
+    "children": [
+      {
+        "id": "ff30f3a58873d537",
+        "type": "leaf",
+        "state": {
+          "type": "markdown",
+          "state": {
+            "file": "README.md",
+            "mode": "source"
+          }
+        }
+      }
+    ],
+    "direction": "vertical"
+  },
+  "left": {
+    "id": "5cdcb02bc7e7e7ed",
+    "type": "split",
+    "children": [
+      {
+        "id": "9a9498e575babd96",
+        "type": "tabs",
+        "children": [
+          {
+            "id": "8ab7147fb9b9e922",
+            "type": "leaf",
+            "state": {
+              "type": "file-explorer",
+              "state": {}
+            }
+          },
+          {
+            "id": "b7f4b9cad79b7a5f",
+            "type": "leaf",
+            "state": {
+              "type": "search",
+              "state": {
+                "query": "",
+                "matchingCase": false,
+                "explainSearch": false,
+                "collapseAll": false,
+                "extraContext": false,
+                "sortOrder": "alphabetical"
+              }
+            }
+          }
+        ]
+      }
+    ],
+    "direction": "horizontal",
+    "width": 300
+  },
+  "right": {
+    "id": "94bd6261221f5ff5",
+    "type": "split",
+    "children": [
+      {
+        "id": "05e864ee028dff3f",
+        "type": "tabs",
+        "children": [
+          {
+            "id": "17ca83af58eb0e52",
+            "type": "leaf",
+            "state": {
+              "type": "backlink",
+              "state": {
+                "file": "README.md",
+                "collapseAll": false,
+                "extraContext": false,
+                "sortOrder": "alphabetical",
+                "showSearch": false,
+                "searchQuery": "",
+                "backlinkCollapsed": false,
+                "unlinkedCollapsed": true
+              }
+            }
+          }
+        ]
+      }
+    ],
+    "direction": "horizontal",
+    "width": 300,
+    "collapsed": true
+  },
+  "active": "ff30f3a58873d537",
+  "lastOpenFiles": [
+    "README.md",
+    "nested1.png",
+    "notes.md",
+    "rightrecursion.png",
+    "co-author.md",
+    "@Parsing Idioms Using Ohm-JS.md",
+    "Untitled 1.md"
+  ]
+}

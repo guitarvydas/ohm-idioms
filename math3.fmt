@@ -1,0 +1,8 @@
+Main [e] = [[\[\n${e}\n\] ]]
+Expr [a] = [[${a}]]
+Additive_op [e op p] = [[${op},\n${e},\n${p}]]
+Additive_single [p] = [[${p}]]
+Operator_add [op] = [[{"operator" : "+"}]]
+Operator_subtract [op] = [[{"operator" : "-"}]]
+Primary_nested [lpar e rpar] = [[\n{"nested" :\n[\n${e}\n]\n\}]]
+Primary_basic [@ds] = [[{"primary" : ${ds}\}]]

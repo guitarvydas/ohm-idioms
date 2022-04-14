@@ -1,0 +1,7 @@
+balancedParens {
+main = inner
+inner
+  = "(" inner* ")" -- nested
+  | stuff          -- flat
+stuff = ~"(" ~")" any
+}
