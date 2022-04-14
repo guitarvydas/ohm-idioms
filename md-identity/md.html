@@ -110,17 +110,19 @@ spc = " "
   }
 
   function identity () {
-      var [cst, treeWalker] = parse ();      
-      treeWalker.addOperation ('identity', identity_hooks);
-      let result = treeWalker (cst).identity ();
-      console.log (result.toString ());
-      document.getElementById ('output').innerHTML = "pt\n" + result.toString ();
+      var [cst, treeMap] = parse ();      
+      treeMap.addOperation ('identity', identity_hooks);
+      let treeWalker = treeMap (cst);
+      // let transpiled = treeWalker ['identity'] ();
+      let transpiled = treeWalker.identity ();
+      console.log (transpiled.toString ());
+      document.getElementById ('output').innerHTML = transpiled.toString ();
       
       // var [cst, hooks] = parse ();
       // if (cst.succeeded ()) {
       //     hooks.addOperation ('identity', identity_hooks);
-      //     let treeWalker = hooks (cst);
-      //     let r = treeWalker.identity ();
+      //     let treeMap = hooks (cst);
+      //     let r = treeMap.identity ();
       //     document.getElementById ('output').innerHTML = r.toString ();
       // } else {
       // }
