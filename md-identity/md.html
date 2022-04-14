@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html>
+<head>
+<style>
+textarea {
+}
+</style>
+</head>
+<body>
+
+<h1>Markdown Parser and Identity Semantics Workbench</h1>
+
+<p>markdown grammar:</p>
+<textarea id="grammar" rows="15" cols="90" placeholder="grammar" style="background-color:oldlace">
+MarkDown {
+
+main = line+
+line = indent? spc? toEOL+ linetail
+linetail =   newline toIndent* -- withContent
+           | newline? end -- withoutContent
+indent = indentChar+
+indentChar = ("#" | "*")
+toIndent = ~indentChar any
+toEOL = ~newline any
+
+newline = "\n"
+spc = " "
+}
+</textarea>
+
+<p>source:</p>
+<textarea id="source" rows="5" cols="90" placeholder="notation test" style="background-color:oldlace;">
+# a b 
+## c d
+## e f
+</textarea>
+<p>output:</p>
+<textarea id="output" rows="5" cols="90" placeholder="identity output" style="background-color:oldlace;">
+</textarea>
+
+
+<p id="status" >READY</p>
+
+
+<br>
+<button onclick="identity ()">Generate Identity</button>
+<script src="https://unpkg.com/ohm-js@16/dist/ohm.min.js"></script>
+<script>
+
+
+  let identity_hooks = {
+      // bits of action code ("semantics") to hang off
+      // like Christmas tree ornaments from the main parse
+      // tree (an AST which becomes a CST when applied
+      //  to actual input text).
+      // In this case, we just want to perform an identity
+      // transform - output == input, to check that
+      // all of the underlying details have no typos in
+      // them...
+      main: function (line) {
+          let r = line.identity ();
+          return r;
+      },
+      line: function (indent, spc, toEOL, linetail) {
+          return [indent.identity (), spc.identity (), toEOL.identity (), linetail.identity ()];
+      },
+      linetail_withContent: function (newline, toIndent) {
+          return [newline.identity (), toIndent.identity ()];
+      },
+      linetail_withoutContent: function (newline, end) {
+          return [newline.identity ()];
+      },
+      indent: function (indentChar) {
+          return [indentChar.identity ()];
+      },
+      indentChar: function (c) {
+          return [c.identity ()];
+      },
+      toIndent: function (c) {
+          return [c.identity ()];
+      },
+      toEOL: function (c) {
+          return [c.identity ()];
+      },
+      newline: function (c) {
+          return [c.identity ()];
+      },
+      spc: function (c) {
+          return [c.identity ()];
+      },
+      _terminal: function () { return this.sourceString; },
+      _iter: function (...children) { return children.map(c => c.identity ());
+      }
+  };
+
+  function parse () {
+      let grammarText = document.getElementById("grammar").value;
+      let src = document.getElementById("source").value;
+      let g = ohm.grammar (grammarText);
+      let matchResult = g.match (src);
+      if (matchResult.succeeded ()) {
+          document.getElementById("status").innerHTML = "OK";
+          let s = g.createSemantics ();
+	  return [matchResult, s];
+      } else {
+          document.getElementById("status").innerHTML = "parse FAILED";
+          let dontcare = null;
+          return [ matchResult, dontcare ];
+      }
+  }
+
+  function identity () {
+      var [mtchResult, s] = parse ();      
+      s.addOperation ('identity', identity_hooks);
+      let fmt = s (mtchResult).identity ();
+      console.log (fmt.toString ());
+      document.getElementById ('output').innerHTML = fmt.toString ();
+      
+      // var [cst, hooks] = parse ();
+      // if (cst.succeeded ()) {
+      //     hooks.addOperation ('identity', identity_hooks);
+      //     let treeWalker = hooks (cst);
+      //     let r = treeWalker.identity ();
+      //     document.getElementById ('output').innerHTML = r.toString ();
+      // } else {
+      // }
+  }
+  
+  </script>
+</body>
+</html>
+
