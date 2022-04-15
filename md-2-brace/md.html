@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html>
+<head>
+<style>
+textarea {
+}
+</style>
+</head>
+<body>
+
+<h1>Markdown Parser and Identity Semantics Workbench 2</h1>
+
+<p>markdown grammar:</p>
+<textarea id="grammar" rows="15" cols="90" placeholder="grammar" style="background-color:oldlace">
+MarkDown {
+
+main = line+
+line = indent? spc? toEOL+ linetail
+linetail =   newline toIndent* -- withContent
+           | newline? end -- withoutContent
+indent = indentChar+
+indentChar = ("#" | "*")
+toIndent = ~indentChar any
+toEOL = ~newline any
+
+newline = "\n"
+spc = " "
+}
+</textarea>
+
+<p>source:</p>
+<textarea id="source" rows="5" cols="90" placeholder="notation test" style="background-color:oldlace;">
+## c d
+</textarea>
+<p>output:</p>
+<textarea id="output" rows="5" cols="90" placeholder="identity output" style="background-color:oldlace;">
+</textarea>
+
+
+<p id="status" >READY</p>
+
+
+<br>
+<button onclick="identity ()">Generate Identity</button>
+<script src="https://unpkg.com/ohm-js@16/dist/ohm.min.js"></script>
+<script>
+
+
+
+  let identity_hooks = {
+      // bits of action code ("semantics") to hang off
+      // like Christmas tree ornaments from the main parse
+      // tree (an AST which becomes a CST when applied
+      //  to actual input text).
+      // In this case, we just want to perform an identity
+      // transform - output == input, to check that
+      // all of the underlying details have no typos in
+      // them...
+      main: function (line) {
+	  console.log (`main ${this.args.depth}`);
+          return [line.identity (9)];
+      },
+      line: function (indent, spc, toEOL, linetail) {
+	  console.log (`xxxline ${this.args.depth}`);
+	  var d = this.args.depth + 1;
+          return [indent.identity (8), spc.identity (8), toEOL.identity (8), linetail.identity (8)];
+      },
+      linetail_withContent: function (newline, toIndent) {
+          return [newline.identity (7), toIndent.identity (7)];
+      },
+      linetail_withoutContent: function (newline, end) {
+          return [newline.identity (7)];
+      },
+      indent: function (indentChar) {
+          return [indentChar.identity (7)];
+      },
+      indentChar: function (c) {
+          return [c.identity (7)];
+      },
+      toIndent: function (c) {
+          return [c.identity (7)];
+      },
+      toEOL: function (c) {
+          return [c.identity (7)];
+      },
+      newline: function (c) {
+          return [c.identity (7)];
+      },
+      spc: function (c) {
+          return [c.identity (7)];
+      },
+      _terminal: function () { 
+	  return this.sourceString; 
+      },
+      _iter: function (...children) { 
+	  return children.map(c => c.identity (7)); 
+      }
+  };
+
+  function parse () {
+      let grammarText = document.getElementById("grammar").value;
+      let src = document.getElementById("source").value;
+      let g = ohm.grammar (grammarText);
+      let matchResult = g.match (src);
+      if (matchResult.succeeded ()) {
+          document.getElementById("status").innerHTML = "OK";
+          let s = g.createSemantics ();
+	  return [matchResult, s];
+      } else {
+          document.getElementById("status").innerHTML = "parse FAILED";
+          let dontcare = null;
+          return [ matchResult, dontcare ];
+      }
+  }
+
+  function parseTreeToString (a) {
+      if (Array.isArray (a)) {
+	  var r = "";
+	  a.forEach (x => { r = r + parseTreeToString (x) + ' '});
+	  return '[' +  parseTreeToString (r.trim ()) + ']';
+      } else {
+	  return a.toString ();
+      }
+  }
+  
+  function identity () {
+      var [cst, treeMap] = parse ();      
+      if (cst.succeeded ()) {
+	  treeMap.addOperation ('identity(depth)', identity_hooks);
+	  let treeWalker = treeMap (cst);
+	  // let transpiled = treeWalker ['identity'] ();
+	  let transpiled = treeWalker.identity (0);
+	  document.getElementById ('output').innerHTML = transpiled.flat (1000).join ('');
+      } else {
+	  document.getElementById ('output').innerHTML = 'FAILED';
+      }
+  }
+  
+  </script>
+</body>
+</html>
+

@@ -39,9 +39,9 @@ ABC
   let hooks = {
       main: function (first, second, third, junk) {
           var d = this.args.depth + 1;
-          var rfirst = first.ptest(d+10);
-          var rsecond = second.ptest(d+11);
-          var rthird = third.ptest(d+12);
+          var rfirst = first.ptest(d+0);
+          var rsecond = second.ptest(d+1);
+          var rthird = third.ptest(d+2);
 	  return [this.args.depth, rfirst, rsecond, rthird];
       },
       first: function (c) {
@@ -76,7 +76,7 @@ ABC
       if (cst.succeeded ()) {
           treeMap.addOperation ('ptest(depth)', hooks);
           let treeWalker = treeMap (cst);
-          let transpiled = treeWalker.ptest (77);
+          let transpiled = treeWalker.ptest (0);
           document.getElementById ('output').innerHTML = transpiled;
       } else {
       }
