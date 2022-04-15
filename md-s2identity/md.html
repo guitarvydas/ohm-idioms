@@ -46,7 +46,7 @@ spc = " "
 <script>
 
 
-  let identity_hooks = {
+  let identity_hooks_with_trace = {
       // bits of action code ("semantics") to hang off
       // like Christmas tree ornaments from the main parse
       // tree (an AST which becomes a CST when applied
@@ -112,6 +112,53 @@ spc = " "
       }
   };
 
+  let identity_hooks = {
+      // bits of action code ("semantics") to hang off
+      // like Christmas tree ornaments from the main parse
+      // tree (an AST which becomes a CST when applied
+      //  to actual input text).
+      // In this case, we just want to perform an identity
+      // transform - output == input, to check that
+      // all of the underlying details have no typos in
+      // them...
+      main: function (line) {
+          return [line.identity ()];
+      },
+      line: function (indent, spc, toEOL, linetail) {
+          return [indent.identity (), spc.identity (), toEOL.identity (), linetail.identity ()];
+      },
+      linetail_withContent: function (newline, toIndent) {
+          return [newline.identity (), toIndent.identity ()];
+      },
+      linetail_withoutContent: function (newline, end) {
+          return [newline.identity ()];
+      },
+      indent: function (indentChar) {
+          return [indentChar.identity ()];
+      },
+      indentChar: function (c) {
+          return [c.identity ()];
+      },
+      toIndent: function (c) {
+          return [c.identity ()];
+      },
+      toEOL: function (c) {
+          return [c.identity ()];
+      },
+      newline: function (c) {
+          return [c.identity ()];
+      },
+      spc: function (c) {
+          return [c.identity ()];
+      },
+      _terminal: function () { 
+	  return this.sourceString; 
+      },
+      _iter: function (...children) { 
+	  return children.map(c => c.identity ()); 
+      }
+  };
+
   function parse () {
       let grammarText = document.getElementById("grammar").value;
       let src = document.getElementById("source").value;
@@ -145,7 +192,7 @@ spc = " "
 	  let treeWalker = treeMap (cst);
 	  // let transpiled = treeWalker ['identity'] ();
 	  let transpiled = treeWalker.identity ();
-	  document.getElementById ('output').innerHTML = Array.isArray (transpiled) + ' ' + transpiled.length + ' ' + transpiled [0][0].length + '\n' + parseTreeToString (transpiled) + '\n' + parseTreeToString (transpiled.flat (1000)) + '\n' + transpiled.flat (1000).join ('');
+	  document.getElementById ('output').innerHTML = transpiled.flat (1000).join ('');
       } else {
 	  document.getElementById ('output').innerHTML = 'FAILED';
       }
