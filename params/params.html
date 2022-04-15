@@ -13,10 +13,10 @@ textarea {
 <p>markdown grammar:</p>
 <textarea id="grammar" rows="15" cols="90" placeholder="grammar" style="background-color:oldlace">
 Test {
-main = first
-first = "A" second
-second = "B" third
-third = "C" any*
+main = first second third any*
+first = "A"
+second = "B"
+third = "C"
 }
 </textarea>
 
@@ -35,19 +35,19 @@ ABC
 <script>
 
   let hooks = {
-      main: function (first) {
+      main: function (first, second, third, junk) {
 	  console.log (`${this.args.depth}`);
-	  first.ptest(1 + this.args.depth);
+	  first.ptest(10);
+	  second.ptest(11);
+	  third.ptest(12);
       },
-      first: function (k, second) {
+      first: function (c) {
 	  console.log (`${this.args.depth}`);
-	  second.ptest(1 + this.args.depth);
       },
-      second: function (k, third) {
+      second: function (c) {
 	  console.log (`${this.args.depth}`);
-	  third.ptest(1 + this.args.depth);
       },
-      third: function (k, third) {
+      third: function (c) {
 	  console.log (`${this.args.depth}`);
       }
   };
