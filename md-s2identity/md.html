@@ -8,7 +8,7 @@ textarea {
 </head>
 <body>
 
-<h1>Markdown Parser and Identity Semantics Workbench</h1>
+<h1>Markdown Parser and Identity Semantics Workbench 2</h1>
 
 <p>markdown grammar:</p>
 <textarea id="grammar" rows="15" cols="90" placeholder="grammar" style="background-color:oldlace">
@@ -46,71 +46,6 @@ spc = " "
 <script>
 
 
-  let identity_hooks_with_trace = {
-      // bits of action code ("semantics") to hang off
-      // like Christmas tree ornaments from the main parse
-      // tree (an AST which becomes a CST when applied
-      //  to actual input text).
-      // In this case, we just want to perform an identity
-      // transform - output == input, to check that
-      // all of the underlying details have no typos in
-      // them...
-      main: function (line) {
-	  var temp = line.identity ()
-	  console.log (`main <- ${parseTreeToString (temp)}`);
-          return [temp];
-      },
-      line: function (indent, spc, toEOL, linetail) {
-	  var ri = indent.identity ();
-	  var rspc = spc.identity ();
-	  var rtoEOL = toEOL.identity ();
-	  var rlinetail = linetail.identity ();
-	  console.log (`line <- ${parseTreeToString (ri)};${parseTreeToString (rspc)};${parseTreeToString (rtoEOL)};${parseTreeToString (rlinetail)}`);
-          return [ri, rspc, rtoEOL, rlinetail];
-      },
-      linetail_withContent: function (newline, toIndent) {
-	  console.log (`linetail_withContent <- ${parseTreeToString (newline.identity ())};${parseTreeToString (toIndent.identity ())}`);
-          return [newline.identity (), toIndent.identity ()];
-      },
-      linetail_withoutContent: function (newline, end) {
-	  console.log (`linetail_withoutContent <- ${parseTreeToString (newline.identity ())};${parseTreeToString (end.identity ())}`);
-          return [newline.identity ()];
-      },
-      indent: function (indentChar) {
-	  var r = indentChar.identity ();
-	  console.log (`indent <- ${parseTreeToString (r)}`);
-          return [r];
-      },
-      indentChar: function (c) {
-          return [c.identity ()];
-      },
-      toIndent: function (c) {
-	  // console.log (`toIndent <- ${parseTreeToString (c.identity ())}`);
-          return [c.identity ()];
-      },
-      toEOL: function (c) {
-	  var temp = c.identity ();
-	  console.log (`toEOL <- /${temp}/`);
-          return [temp];
-      },
-      newline: function (c) {
-	  // console.log (`newline <- ${parseTreeToString (c.identity ())}`);
-          return [c.identity ()];
-      },
-      spc: function (c) {
-	  var temp = c.identity ()
-	  console.log (`spc <- /${parseTreeToString (temp)}/`);
-          return [temp];
-      },
-      _terminal: function () { 
-	  // console.log (`_terminal <- /${this.sourceString}/`);
-	  return this.sourceString; 
-      },
-      _iter: function (...children) { 
-	  // console.log ('(_iter)', '');
-	  return children.map(c => c.identity ()); 
-      }
-  };
 
   let identity_hooks = {
       // bits of action code ("semantics") to hang off

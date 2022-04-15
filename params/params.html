@@ -25,6 +25,8 @@ third = "C"
 ABC
 </textarea>
 <p>output:</p>
+<textarea id="output" rows="5" cols="90" placeholder="notation test" style="background-color:oldlace;">
+</textarea>
 
 <p id="status" >READY</p>
 
@@ -36,19 +38,20 @@ ABC
 
   let hooks = {
       main: function (first, second, third, junk) {
-	  console.log (`${this.args.depth}`);
-	  first.ptest(10);
-	  second.ptest(11);
-	  third.ptest(12);
+          var d = this.args.depth + 1;
+          var rfirst = first.ptest(d+10);
+          var rsecond = second.ptest(d+11);
+          var rthird = third.ptest(d+12);
+	  return [this.args.depth, rfirst, rsecond, rthird];
       },
       first: function (c) {
-	  console.log (`${this.args.depth}`);
+          return this.args.depth;
       },
       second: function (c) {
-	  console.log (`${this.args.depth}`);
+          return this.args.depth;
       },
       third: function (c) {
-	  console.log (`${this.args.depth}`);
+          return this.args.depth;
       }
   };
   
@@ -60,7 +63,7 @@ ABC
       if (matchResult.succeeded ()) {
           document.getElementById("status").innerHTML = "parse OK";
           let s = g.createSemantics ();
-	  return [matchResult, s];
+          return [matchResult, s];
       } else {
           document.getElementById("status").innerHTML = "parse FAILED";
           let dontcare = null;
@@ -71,10 +74,10 @@ ABC
   function test () {
       var [cst, treeMap] = parse ();      
       if (cst.succeeded ()) {
-	  treeMap.addOperation ('ptest(depth)', hooks);
-	  let treeWalker = treeMap (cst);
-	  let transpiled = treeWalker.ptest (0);
-	  document.getElementById ('status').innerHTML = "semantics SUCCEEDED";
+          treeMap.addOperation ('ptest(depth)', hooks);
+          let treeWalker = treeMap (cst);
+          let transpiled = treeWalker.ptest (77);
+          document.getElementById ('output').innerHTML = transpiled;
       } else {
       }
   }
