@@ -47,14 +47,26 @@ spc = " "
 <script src="https://unpkg.com/ohm-js@16/dist/ohm.min.js"></script>
 <script>
 
-  function plusAsArray (a) { console.log (`pa ${a.length} ${parseTreeToString (a)}`); return a; } // _iter (+) node already returns an array
-  function asteriskAsArray (a) { return a; } // _iter (*) node already returns an array
-  function questionMarkAsArray (a) { return a; } // _iter (?) node already returns an array
-  let pa = plusAsArray;
-  let aa = asteriskAsArray;
-  let qa = questionMarkAsArray;
+  function first (a) { return a[0]; }
+  
+  function opt (a) { // ?
+      if (0 < a.length) {
+	  return first (a);
+      } else {
+	  return a;
+      }
+  }
 
+  function kp (a) { // Kleene +
+      if (0 < a.length) {
+	  return a.flat (1);
+      } else {
+	  return a;
+      }
+  }
 
+  const ks = kp; // Kleene *
+  
   let identity_hooks = {
       // bits of action code ("semantics") to hang off
       // like Christmas tree ornaments from the main parse
@@ -65,22 +77,22 @@ spc = " "
       // all of the underlying details have no typos in
       // them...
       main: function (line) {
-          return pa (line.identity ());
+          return [kp (line.identity ())];
       },
       line: function (indent, spc, toEOL, linetail) {
-	  var i = qa (indent.identity ());
+	  var i = opt (indent.identity ());
 	  var d = i.length;
 	  console.log (`line indent=${d} /${parseTreeToString (i)}/`);
-          return [i, qa (spc.identity ()), pa (toEOL.identity ()), linetail.identity ()];
+          return [i, opt (spc.identity ()), kp (toEOL.identity ()), linetail.identity ()];
       },
       linetail_withContent: function (newline, toIndent) {
-          return [newline.identity (), toIndent.identity ()];
+          return [newline.identity (), ks (toIndent.identity ())];
       },
       linetail_withoutContent: function (newline, end) {
-          return [newline.identity ()];
+          return [opt (newline.identity ()), end.identity ()];
       },
       indent: function (indentChar) {
-          return pa (indentChar.identity ());
+          return [kp (indentChar.identity ())];
       },
       indentChar: function (c) {
           return [c.identity ()];
