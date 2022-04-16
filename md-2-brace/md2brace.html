@@ -30,7 +30,9 @@ spc = " "
 
 <p>source:</p>
 <textarea id="source" rows="5" cols="90" placeholder="notation test" style="background-color:oldlace;">
+# a b
 ## c d
+## e f
 </textarea>
 <p>output:</p>
 <textarea id="output" rows="5" cols="90" placeholder="identity output" style="background-color:oldlace;">
@@ -45,6 +47,12 @@ spc = " "
 <script src="https://unpkg.com/ohm-js@16/dist/ohm.min.js"></script>
 <script>
 
+  function plusAsArray (a) { console.log (`pa ${a.length} ${parseTreeToString (a)}`); return a; } // _iter (+) node already returns an array
+  function asteriskAsArray (a) { return a; } // _iter (*) node already returns an array
+  function questionMarkAsArray (a) { return a; } // _iter (?) node already returns an array
+  let pa = plusAsArray;
+  let aa = asteriskAsArray;
+  let qa = questionMarkAsArray;
 
 
   let identity_hooks = {
@@ -57,43 +65,43 @@ spc = " "
       // all of the underlying details have no typos in
       // them...
       main: function (line) {
-	  console.log (`main ${this.args.depth}`);
-          return [line.identity (9)];
+          return pa (line.identity ());
       },
       line: function (indent, spc, toEOL, linetail) {
-	  console.log (`xxxline ${this.args.depth}`);
-	  var d = this.args.depth + 1;
-          return [indent.identity (8), spc.identity (8), toEOL.identity (8), linetail.identity (8)];
+	  var i = qa (indent.identity ());
+	  var d = i.length;
+	  console.log (`line indent=${d} /${parseTreeToString (i)}/`);
+          return [i, qa (spc.identity ()), pa (toEOL.identity ()), linetail.identity ()];
       },
       linetail_withContent: function (newline, toIndent) {
-          return [newline.identity (7), toIndent.identity (7)];
+          return [newline.identity (), toIndent.identity ()];
       },
       linetail_withoutContent: function (newline, end) {
-          return [newline.identity (7)];
+          return [newline.identity ()];
       },
       indent: function (indentChar) {
-          return [indentChar.identity (7)];
+          return pa (indentChar.identity ());
       },
       indentChar: function (c) {
-          return [c.identity (7)];
+          return [c.identity ()];
       },
       toIndent: function (c) {
-          return [c.identity (7)];
+          return [c.identity ()];
       },
       toEOL: function (c) {
-          return [c.identity (7)];
+          return [c.identity ()];
       },
       newline: function (c) {
-          return [c.identity (7)];
+          return [c.identity ()];
       },
       spc: function (c) {
-          return [c.identity (7)];
+          return [c.identity ()];
       },
       _terminal: function () { 
 	  return this.sourceString; 
       },
       _iter: function (...children) { 
-	  return children.map(c => c.identity (7)); 
+	  return children.map(c => c.identity ()); 
       }
   };
 
@@ -126,16 +134,18 @@ spc = " "
   function identity () {
       var [cst, treeMap] = parse ();      
       if (cst.succeeded ()) {
-	  treeMap.addOperation ('identity(depth)', identity_hooks);
+	  treeMap.addOperation ('identity', identity_hooks);
 	  let treeWalker = treeMap (cst);
 	  // let transpiled = treeWalker ['identity'] ();
-	  let transpiled = treeWalker.identity (0);
+	  let transpiled = treeWalker.identity ();
 	  document.getElementById ('output').innerHTML = transpiled.flat (1000).join ('');
       } else {
 	  document.getElementById ('output').innerHTML = 'FAILED';
       }
   }
+
   
+
   </script>
 </body>
 </html>
