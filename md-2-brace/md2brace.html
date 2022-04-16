@@ -81,7 +81,7 @@ spc = " "
       },
       line: function (indent, spc, toEOL, linetail) {
 	  var i = opt (indent.identity ());
-	  var d = i.length;
+	  var d = first (i).length;
 	  console.log (`line indent=${d} /${parseTreeToString (i)}/`);
           return [i, opt (spc.identity ()), kp (toEOL.identity ()), linetail.identity ()];
       },
