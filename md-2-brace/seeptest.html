@@ -66,7 +66,6 @@ spc = " "
       }
       
       function specialize (key, obj) {
-          console.log (`typeof=${typeof obj} obj=${obj}`);
           let v = obj [key];
           if (v !== undefined) {
               return v;
@@ -98,11 +97,13 @@ spc = " "
       
       function KleeneStar (objArray) {
           let seq = new Sequence (objArray);
+	  // all operations except length flow through to first ()
           return seq;
       }
 
       function KleenePlus (objArray) {
           let seq = new Sequence (objArray);
+	  // all operations except length flow through to first ()
           return seq;
       }
 
@@ -149,9 +150,11 @@ spc = " "
 
 // indent = indentChar+
           indent: function (p_indentChar) {
-              let indentChar = new KleeneStar ([p_indentChar.identity ()]);
-              return new Single (indentChar);
+              let scope = new KleeneStar ([p_indentChar.identity ()]);
+	      scope.indentLength = function () { return scope.seep ('length'); };
+	      return new Single (scope);
           },
+
 // indentChar = ("#" | "*")
           indentChar: function (p_c) {
               let c = p_c.identity ();
@@ -219,7 +222,9 @@ spc = " "
               let treeWalker = treeMap (cst);
               // let transpiled = treeWalker ['identity'] ();
               let transpiled = treeWalker.identity ();
-              document.getElementById ('output').innerHTML = transpiled.first ().seep ('length') + '\n' + parseTreeToString (transpiled);
+              document.getElementById ('output').innerHTML = transpiled.first ()
+		  .seep ('indentLength') + 
+		  '\n' + parseTreeToString (transpiled);
           } else {
               document.getElementById ('output').innerHTML = 'FAILED';
           }
