@@ -128,9 +128,9 @@ spc = " "
           },
 // line = indent? spc? toEOL+ linetail
           line: function (p_indent, p_spc, p_toEOL, p_linetail) {
-              let indent = new Opt (p_indent.identity ());
-              let spc = new Opt (p_spc.identity ());
-              let toEOL = new KleeneStar (p_toEOL.identity ());
+              let indent = new Opt ([p_indent.identity ()]);
+              let spc = new Opt ([p_spc.identity ()]);
+              let toEOL = new KleeneStar ([p_toEOL.identity ()]);
               let linetail = new Single (p_linetail.identity ());
               return new Sequence ([indent, spc, toEOL, linetail]);
           },
@@ -138,18 +138,18 @@ spc = " "
 // | newline? end -- withoutContent
           linetail_withContent: function (p_newline, p_toIndent) {
               let newline = new Single (p_newline.identity ());
-              let toIndent = new KleeneStar (p_toIndent.identity ());
+              let toIndent = new KleeneStar ([p_toIndent.identity ()]);
               return new Sequence ([newline, toIndent]);
           },
           linetail_withoutContent: function (p_newline, p_end) {
-              let newline = Opt (p_newline.identity ());
+              let newline = new Opt ([p_newline.identity ()]);
               let end = new Single (p_end.identity ());
               return new Sequence ([newline, end]);
           },
 
 // indent = indentChar+
           indent: function (p_indentChar) {
-              let indentChar = new KleeneStar (p_indentChar.identity ());
+              let indentChar = new KleeneStar ([p_indentChar.identity ()]);
               return new Single (indentChar);
           },
 // indentChar = ("#" | "*")
