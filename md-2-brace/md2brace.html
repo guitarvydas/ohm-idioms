@@ -47,26 +47,28 @@ spc = " "
 <script src="https://unpkg.com/ohm-js@16/dist/ohm.min.js"></script>
 <script>
 
-  function first (a) { return a[0]; }
-  
-  function opt (a) { // ?
+  function opt (a, field) { // ? (optional)
       if (0 < a.length) {
-	  return first (a);
+	  return field (a[0]);
       } else {
-	  return a;
+	  return null;
       }
   }
 
-  function kp (a) { // Kleene +
+  function ks (a, field) { // Kleene * (zero or more)
       if (0 < a.length) {
-	  return a.flat (1);
+	  return field (a);
       } else {
-	  return a;
+	  return null;
       }
   }
 
-  const ks = kp; // Kleene *
-  
+  const kp = ks; // Kleene + (one or more)
+
+  // function functionToInternal (f) {
+      
+  const f2i = functionToInternal;
+
   let identity_hooks = {
       // bits of action code ("semantics") to hang off
       // like Christmas tree ornaments from the main parse
@@ -76,38 +78,50 @@ spc = " "
       // transform - output == input, to check that
       // all of the underlying details have no typos in
       // them...
-      main: function (line) {
-          return [kp (line.identity ())];
+      main: function (p_line) {
+	  let line = p_line.identity ();
+          return [line (f2i)];
       },
-      line: function (indent, spc, toEOL, linetail) {
-	  var i = opt (indent.identity ());
-	  var d = first (i).length;
-	  console.log (`line indent=${d} /${parseTreeToString (i)}/`);
-          return [i, opt (spc.identity ()), kp (toEOL.identity ()), linetail.identity ()];
+      line: function (p_indent, p_spc, p_toEOL, p_linetail) {
+	  let indent = p_indent.identity ();
+	  let spc = p_spc.identity ();
+	  let toEOL = p_toEOL.identity ();
+	  let linetail = p__linetail.identity ();
+          return [indent (f2i), spc (f2i), toEOL (f2i), linetail (f2i)];
       },
-      linetail_withContent: function (newline, toIndent) {
-          return [newline.identity (), ks (toIndent.identity ())];
+      linetail_withContent: function (p_newline, p_toIndent) {
+	  let newline = p_newline.identity ();
+	  let toIndent = p_toIndent.identity ();
+          return [newline (f2i), toIndent (f2i)];
       },
-      linetail_withoutContent: function (newline, end) {
-          return [opt (newline.identity ()), end.identity ()];
+      linetail_withoutContent: function (p_newline, p_end) {
+	  let newline = p_newline.identity ();
+	  let end = p_end.identity ();
+          return [newline (f2i), end (f2i)];
       },
-      indent: function (indentChar) {
-          return [kp (indentChar.identity ())];
+      indent: function (p_indentChar) {
+	  let indentChar = p_indentChar.identity ();
+          return [indentChar (f2i)];
       },
-      indentChar: function (c) {
-          return [c.identity ()];
+      indentChar: function (p_c) {
+	  let c = p_c.identity ();
+          return [c (f2i)];
       },
-      toIndent: function (c) {
-          return [c.identity ()];
+      toIndent: function (p_c) {
+	  let c = p_c.identity ();
+          return [c (f2i)];
       },
-      toEOL: function (c) {
-          return [c.identity ()];
+      toEOL: function (p_c) {
+	  let c = p_c.identity ();
+          return [c (f2i)];
       },
-      newline: function (c) {
-          return [c.identity ()];
+      newline: function (p_c) {
+	  let c = p_c.identity ();
+          return [c (f2i)];
       },
-      spc: function (c) {
-          return [c.identity ()];
+      spc: function (p_c) {
+	  let c = p_c.identity ();
+          return [c (f2i)];
       },
       _terminal: function () { 
 	  return this.sourceString; 
@@ -156,7 +170,11 @@ spc = " "
       }
   }
 
-  
+  // helpers for hooks
+  function countIndent (indentArray) {
+      // the indent rule returns an array of an array
+      return first (indentArray).length 
+  }
 
   </script>
 </body>
