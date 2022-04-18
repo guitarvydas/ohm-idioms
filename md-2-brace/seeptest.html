@@ -28,7 +28,7 @@ spc = " "
     </textarea>
 
     <p>source:</p>
-    <textarea id="source" rows="5" cols="90" placeholder="notation test" style="background-color:oldlace;">## a
+    <textarea id="source" rows="5" cols="90" placeholder="notation test" style="background-color:oldlace;">### a
 </textarea>
     <p>output:</p>
     <textarea id="output" rows="5" cols="90" placeholder="identity output" style="background-color:oldlace;">
@@ -223,7 +223,7 @@ spc = " "
               // let transpiled = treeWalker ['identity'] ();
               let transpiled = treeWalker.identity ();
               document.getElementById ('output').innerHTML =
-                  transpiled.seep ('indentLength') () + '\n' + parseTreeToString (transpiled);
+                  transpiled.seep ('indentLength') () + '\n';
           } else {
               document.getElementById ('output').innerHTML = 'FAILED';
           }
