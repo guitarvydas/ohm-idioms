@@ -97,19 +97,19 @@ spc = " "
       
       function KleeneStar (objArray) {
           let seq = new Sequence (objArray);
-	  // all operations except length flow through to first ()
+          // all operations except length flow through to first ()
           return seq;
       }
 
       function KleenePlus (objArray) {
           let seq = new Sequence (objArray);
-	  // all operations except length flow through to first ()
+          // all operations except length flow through to first ()
           return seq;
       }
 
       function Single (obj) {
-	  let seq = new Sequence ([obj]);
-	  return seq;
+          let seq = new Sequence ([obj]);
+          return seq;
       }
 
       let identity_hooks = {
@@ -151,8 +151,8 @@ spc = " "
 // indent = indentChar+
           indent: function (p_indentChar) {
               let scope = new KleeneStar ([p_indentChar.identity ()]);
-	      scope.indentLength = function () { return scope.seep ('length'); };
-	      return new Single (scope);
+              scope.indentLength = function () { return scope.seep ('length'); };
+              return new Single (scope);
           },
 
 // indentChar = ("#" | "*")
@@ -222,9 +222,8 @@ spc = " "
               let treeWalker = treeMap (cst);
               // let transpiled = treeWalker ['identity'] ();
               let transpiled = treeWalker.identity ();
-              document.getElementById ('output').innerHTML = transpiled.first ()
-		  .seep ('indentLength') + 
-		  '\n' + parseTreeToString (transpiled);
+              document.getElementById ('output').innerHTML =
+                  transpiled.seep ('indentLength') () + '\n' + parseTreeToString (transpiled);
           } else {
               document.getElementById ('output').innerHTML = 'FAILED';
           }
