@@ -29,8 +29,8 @@ spc = " "
 
     <p>source:</p>
     <textarea id="source" rows="5" cols="90" placeholder="notation test" style="background-color:oldlace;">
-### a
-</textarea>
+## c d
+    </textarea>
     <p>output:</p>
     <textarea id="output" rows="5" cols="90" placeholder="identity output" style="background-color:oldlace;">
     </textarea>
@@ -44,73 +44,58 @@ spc = " "
     <script src="https://unpkg.com/ohm-js@16/dist/ohm.min.js"></script>
     <script>
 
-      function defaultValue (ty) { // value depends on context; if number required, value=0, else ""
-          if (ty === 'number') {
-              return 0;
-          } else {
-              return "";
-          }
+      function findInNamespace (ns, name) {
+	  return ns [name];
       }
 
-      function Leaf (s) {
-          this.value = s;
-          this.verbatim = this;
-          this.asArray = function () { return [this.value]; };
-          this.seep = function (key) {
-              let v = this [key];
-              if (v) {
-                  return v;
-              } else {
-                  throw `seep: ${key} no such key`;
-              }
-          }
+      function arrayShallowCopy (a) { console.log (a); return [...a]; }
+      
+      function getValue (stack, fieldname) {
+	  let stk = arrayShallowCopy (stack);
+	  return agetValue (stk, fieldname);
       }
       
-      function specialize (key, obj) {
-          let v = obj [key];
-          if (v !== undefined) {
-              return v;
-          } else {
-              return obj.seep (key);
-          }
-      }      
-      
-      function Sequence (objArray) {
-          this.verbatim = this;
-          this.objArray = objArray;
-          this.length = this.objArray.length;
-          this.asArray = function () { return this.objArray; };
-          this.seep = function (key) {
-              return specialize (key, this.objArray[0]);
-          },
-          this.first = function () { return this.objArray[0]; }
-      }
-      
-      function Opt (objArray) {
-          let seq;
-          if (1 === objArray.length) {
-              seq = new Sequence (objArray);
-          } else {
-              seq = new Sequence ([]);
-          }
-          return seq;
-      }
-      
-      function KleeneStar (objArray) {
-          let seq = new Sequence (objArray);
-          // all operations except length flow through to first ()
-          return seq;
+      function agetValue (stk, fieldname) {
+	  console.log (stk);
+	  if (0 >= stk.length) {
+	      throw `field ${fieldname} not found`;
+	  } else {
+	      let firstns = stk.pop ();
+	      console.log (firstns);
+	      let v = findInNamespace (firstns, fieldname);
+	      if (undefined !== v) {
+		  return v;
+	      } else {
+		  return agetValue (stk, fieldname);
+	      }
+	  }
       }
 
-      function KleenePlus (objArray) {
-          let seq = new Sequence (objArray);
-          // all operations except length flow through to first ()
-          return seq;
+      function sequence (objArray) {
+	  return objArray;
+      }
+      
+      function opt (ohmNode, op) {
+	  // maybe zero (0) matches
+	  if (ohmNode.numChildren > 0) {
+	      return ohmNode [op] ();
+	  } else {
+	      return {};
+	  }
+      }
+      
+      function kleeneStar (ohmNode, op) {
+	  // maybe zero (0) matches
+	  if (ohmNode.numChildren > 0) {
+	      return ohmNode [op] ();
+	  } else {
+	      return {};
+	  }
       }
 
-      function Single (obj) {
-          let seq = new Sequence ([obj]);
-          return seq;
+      function kleenePlus (objArray, op) {
+	  // always > 0 matches
+	  return ohmNode [op] ();
       }
 
       let identity_hooks = {
@@ -123,69 +108,72 @@ spc = " "
           // all of the underlying details have no typos in
           // them...
 
-// main = line+
+	  // main = line+
           main: function (p_line) {
               let line = p_line.identity ();
-              return new KleenePlus ([line]);
+              return kleenePlus (line);
           },
-// line = indent? spc? toEOL+ linetail
+	  // line = indent? spc? toEOL+ linetail
           line: function (p_indent, p_spc, p_toEOL, p_linetail) {
-              let indent = new Opt ([p_indent.identity ()]);
-              let spc = new Opt ([p_spc.identity ()]);
-              let toEOL = new KleeneStar ([p_toEOL.identity ()]);
-              let linetail = new Single (p_linetail.identity ());
-              return new Sequence ([indent, spc, toEOL, linetail]);
+              let indent = opt (p_indent, 'identity');
+              let spc = opt (p_spc, 'identity');
+              let toEOL = kleeneStar (p_toEOL, 'identity');
+              let linetail = p_linetail.identity ();
+
+	      let depth = getValue (indent, 'depth');
+
+              return sequence ([indent, spc, toEOL, linetail]);
           },
-// linetail =   newline toIndent* -- withContent
-// | newline? end -- withoutContent
+	  // linetail =   newline toIndent* -- withContent
+	  // | newline? end -- withoutContent
           linetail_withContent: function (p_newline, p_toIndent) {
-              let newline = new Single (p_newline.identity ());
-              let toIndent = new KleeneStar ([p_toIndent.identity ()]);
-              return new Sequence ([newline, toIndent]);
+              let newline = p_newline.identity ();
+              let toIndent = kleeneStar (p_toIndent, 'identity');
+              return sequence ([newline, toIndent]);
           },
           linetail_withoutContent: function (p_newline, p_end) {
-              let newline = new Opt ([p_newline.identity ()]);
-              let end = new Single (p_end.identity ());
-              return new Sequence ([newline, end]);
+              let newline = opt (p_newline, 'identity');
+              let end = p_end.identity ();
+              return sequence ([newline, end]);
           },
 
-// indent = indentChar+
+	  // indent = indentChar+
           indent: function (p_indentChar) {
-              let scope = new KleeneStar ([p_indentChar.identity ()]);
-              scope.indentLength = function () { return scope.seep ('length'); };
-              return new Single (scope);
-          },
-
-// indentChar = ("#" | "*")
+              let stack = kleeneStar (p_indentChar, 'identity');
+	      stack.push ({ depth: p_indentChar.numChildren }, stack);
+	      return stack;
+	  },
+	  
+	  // indentChar = ("#" | "*")
           indentChar: function (p_c) {
-              let c = p_c.identity ();
-              return new Single (c);
+	      let stack = p_c.identity ();
+	      return stack;
           },
-// toIndent = ~indentChar any
+	  // toIndent = ~indentChar any
           toIndent: function (p_c) {
-              let c = p_c.identity ();
-              return new Single (c);
+	      let stack = p_c.identity ();
+	      return stack;
           },
-// toEOL = ~newline any
+	  // toEOL = ~newline any
           toEOL: function (p_c) {
-              let c = p_c.identity ();
-              return new Single (c);
+	      let stack = p_c.identity ();
+	      return stack;
           },
-// newline = "\n"
+	  // newline = "\n"
           newline: function (p_c) {
-              let c = p_c.identity ();
-              return new Single (c);
+	      let stack = p_c.identity ();
+	      return stack;
           },
-// spc = " "
+	  // spc = " "
           spc: function (p_c) {
-              let c = p_c.identity ();
-              return new Single (c);
+	      let stack = p_c.identity ();
+	      return stack;
           },
           _terminal: function () {
-              return new Leaf (this.sourceString); 
+	      return {text: this.sourceString};
           },
           _iter: function (...children) { 
-              return new Sequence (children.map(c => c.identity ())); 
+	      return children.map(c => c.identity ()); 
           }
       };
       
@@ -195,38 +183,38 @@ spc = " "
           let g = ohm.grammar (grammarText);
           let matchResult = g.match (src);
           if (matchResult.succeeded ()) {
-              document.getElementById("status").innerHTML = "OK";
-              let s = g.createSemantics ();
-              return [matchResult, s];
+	      document.getElementById("status").innerHTML = "OK";
+	      let s = g.createSemantics ();
+	      return [matchResult, s];
           } else {
-              document.getElementById("status").innerHTML = "parse FAILED";
-              let dontcare = null;
-              return [ matchResult, dontcare ];
+	      document.getElementById("status").innerHTML = "parse FAILED";
+	      let dontcare = null;
+	      return [ matchResult, dontcare ];
           }
       }
 
       function parseTreeToString (p_a) {
           if (typeof p_a === 'string' || p_a instanceof String) {
-              return p_a;
+	      return p_a;
           } else {
-              let a = p_a.asArray ();
-              var r = "";
-              a.forEach (x => { r = r + parseTreeToString (x) + ' '});
-              return '[' +  parseTreeToString (r.trim ()) + ']';
+	      let a = p_a.asArray ();
+	      var r = "";
+	      a.forEach (x => { r = r + parseTreeToString (x) + ' '});
+	      return '[' +  parseTreeToString (r.trim ()) + ']';
           }
       }
       
       function identity () {
           var [cst, treeMap] = parse ();      
           if (cst.succeeded ()) {
-              treeMap.addOperation ('identity', identity_hooks);
-              let treeWalker = treeMap (cst);
-              // let transpiled = treeWalker ['identity'] ();
-              let transpiled = treeWalker.identity ();
-              document.getElementById ('output').innerHTML =
+	      treeMap.addOperation ('identity', identity_hooks);
+	      let treeWalker = treeMap (cst);
+	      // let transpiled = treeWalker ['identity'] ();
+	      let transpiled = treeWalker.identity ();
+	      document.getElementById ('output').innerHTML =
                   transpiled.seep ('indentLength') () + '\n';
           } else {
-              document.getElementById ('output').innerHTML = 'FAILED';
+	      document.getElementById ('output').innerHTML = 'FAILED';
           }
       }
 
