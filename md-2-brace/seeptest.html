@@ -133,12 +133,13 @@ spc = " "
 
 	      let lineText = asText (p_spc) + asText (p_toEOL) + asText (p_linetail);
 
-	      let ns = {lineText: lineText, depthChange: depth-pdepth};
+	      if (0 < cont.length) {
+		  lineText = lineText + getValue (cont, 'lineText');
+	      }
 
-	      let stack = cont;
-	      stack.push (ns);
+	      let ns = {lineText: function () {return lineText;}, depthChange: function () {return depth-pdepth;}};
 
-              return stack;
+              return [ns];
           },
           // linetail =   newline toIndent* -- withContent
           // | newline? end -- withoutContent
@@ -227,7 +228,7 @@ spc = " "
               let treeWalker = treeMap (cst);
               // let transpiled = treeWalker ['identity'] ();
               let stack = treeWalker.identity (0);
-	      let text = stack.reverse ().map (item => {return item.lineText;}).join('');
+	      let text = stack.reverse ().map (item => {return item.lineText ();}).join('');
               document.getElementById ('output').innerHTML = text;
           } else {
               document.getElementById ('output').innerHTML = 'FAILED';
