@@ -35,7 +35,7 @@ spc = " "
 # g h
     </textarea>
     <p>output:</p>
-    <textarea id="output" rows="5" cols="90" placeholder="identity output" style="background-color:oldlace;">
+    <textarea id="output" rows="10" cols="90" placeholder="identity output" style="background-color:oldlace;">
     </textarea>
 
 
@@ -133,17 +133,21 @@ spc = " "
 
 	      let lineText = asText (p_spc) + asText (p_toEOL) + asText (p_linetail);
 
+	      let contText;
 	      if (0 < cont.length) {
-		  lineText = lineText + getValue (cont, 'lineText');
+		  contText = getValue (cont, 'lineText');
+	      } else {
+		  contText = "";
 	      }
 
-	      if (0 < (depth - pdepth)) {
-		  lineText = "{" + lineText;
-	      } else if (0 > (depth - pdepth)) {
-		  lineText = lineText + "}";
+	      let diff = depth - pdepth;
+	      if (0 < diff) {
+		  lineText = "{" + lineText + contText;
+	      } else if (0 > diff) {
+		  lineText = lineText + "}" + contText;
 	      }
 
-	      let ns = {lineText: function () {return lineText;}, depthChange: function () {return depth-pdepth;}};
+	      let ns = {lineText: function () {return lineText;}, depthChange: function () {return diff;}};
 
               return [ns];
           },
