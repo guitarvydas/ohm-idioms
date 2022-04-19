@@ -112,71 +112,82 @@ spc = " "
           // them...
 
           // main = lines
-          main: function (p_lines, pdepth) {
+          main: function (p_lines) {
+	      let pdepth = this.args.pdepth
               let line = p_lines.identity (pdepth);
-              return kleenePlus (p_lines, 'identity', pdepth);
+              return kleenePlus (p_lines, 'identity');
           },
           // lines = indent? spc? toEOL+ linetail lines?
-          lines: function (p_indent, p_spc, p_toEOL, p_linetail, p_continuation, pdepth) {
+          lines: function (p_indent, p_spc, p_toEOL, p_linetail, p_continuation) {
+	      let pdepth = this.args.pdepth;
               let indent = opt (p_indent, 'identity', pdepth);
               let spc = opt (p_spc, 'identity', pdepth);
               let toEOL = kleeneStar (p_toEOL, 'identity', pdepth);
-              let linetail = p_linetail.identity (pdepth);
-	      let prevdepth = this.args.pdepth;
               let depth = getValue (indent, 'depth');
-	      let cont = p_continuation.identity (depth, pdepth);
+              let linetail = p_linetail.identity (depth);
+	      let cont = p_continuation.identity (depth);
 
               return sequence ([depth,  cont]);
           },
           // linetail =   newline toIndent* -- withContent
           // | newline? end -- withoutContent
-          linetail_withContent: function (p_newline, p_toIndent, pdepth) {
+          linetail_withContent: function (p_newline, p_toIndent) {
+	      let pdepth = this.args.pdepth;
               let newline = p_newline.identity (pdepth);
               let toIndent = kleeneStar (p_toIndent, 'identity', pdepth);
               return sequence ([newline, toIndent]);
           },
-          linetail_withoutContent: function (p_newline, p_end, pdepth) {
+          linetail_withoutContent: function (p_newline, p_end) {
+	      let pdepth = this.args.pdepth;
               let newline = opt (p_newline, 'identity', pdepth);
               let end = p_end.identity (pdepth);
               return sequence ([newline, end]);
           },
 
           // indent = indentChar+
-          indent: function (p_indentChar, pdepth) {
+          indent: function (p_indentChar) {
+	      let pdepth = this.args.pdepth;
               let stack = kleeneStar (p_indentChar, 'identity', pdepth);
               stack.push ({ depth: function () { return p_indentChar.numChildren; }});
               return stack;
           },
           
           // indentChar = ("#" | "*")
-          indentChar: function (p_c, pdepth) {
+          indentChar: function (p_c) {
+	      let pdepth = this.args.pdepth;
               let stack = p_c.identity (pdepth);
               return stack;
           },
           // toIndent = ~indentChar any
-          toIndent: function (p_c, pdepth) {
+          toIndent: function (p_c) {
+	      let pdepth = this.args.pdepth;
               let stack = p_c.identity (pdepth);
               return stack;
           },
           // toEOL = ~newline any
-          toEOL: function (p_c, pdepth) {
+          toEOL: function (p_c) {
+	      let pdepth = this.args.pdepth;
               let stack = p_c.identity (pdepth);
               return stack;
           },
           // newline = "\n"
-          newline: function (p_c, pdepth) {
+          newline: function (p_c) {
+	      let pdepth = this.args.pdepth;
               let stack = p_c.identity (pdepth);
               return stack;
           },
           // spc = " "
-          spc: function (p_c, pdepth) {
+          spc: function (p_c) {
+	      let pdepth = this.args.pdepth;
               let stack = p_c.identity (pdepth);
               return stack;
           },
-          _terminal: function (pdepth) {
+          _terminal: function () {
+	      let pdepth = this.args.pdepth;
               return {text: this.sourceString};
           },
-          _iter: function (pdepth, ...children) { 
+          _iter: function (...children) { 
+	      let pdepth = this.args.pdepth;
               let stk =  flatten (children.map(c => c.identity (pdepth))); 
               return stk;
           }
