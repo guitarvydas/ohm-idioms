@@ -32,6 +32,7 @@ spc = " "
 # a b
 ## c d
 ## e f
+# g h
     </textarea>
     <p>output:</p>
     <textarea id="output" rows="5" cols="90" placeholder="identity output" style="background-color:oldlace;">
@@ -114,7 +115,7 @@ spc = " "
           main: function (p_lines) {
 	      let pdepth = this.args.pdepth
               let line = p_lines.identity (pdepth);
-              return kleenePlus (p_lines, 'identity');
+              return kleenePlus (p_lines, 'identity', pdepth);
           },
           // lines = indent? spc? toEOL+ linetail lines?
           lines: function (p_indent, p_spc, p_toEOL, p_linetail, p_continuation) {
@@ -126,7 +127,7 @@ spc = " "
               let linetail = p_linetail.identity (depth);
 	      let cont = p_continuation.identity (depth);
 
-              return sequence ([depth,  cont]);
+              return sequence ([depth-pdepth,  cont]);
           },
           // linetail =   newline toIndent* -- withContent
           // | newline? end -- withoutContent
