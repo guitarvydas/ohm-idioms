@@ -137,6 +137,12 @@ spc = " "
 		  lineText = lineText + getValue (cont, 'lineText');
 	      }
 
+	      if (0 < (depth - pdepth)) {
+		  lineText = "{" + lineText;
+	      } else if (0 > (depth - pdepth)) {
+		  lineText = lineText + "}";
+	      }
+
 	      let ns = {lineText: function () {return lineText;}, depthChange: function () {return depth-pdepth;}};
 
               return [ns];
