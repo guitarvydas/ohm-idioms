@@ -133,9 +133,12 @@ spc = " "
 
 	      let lineText = asText (p_spc) + asText (p_toEOL) + asText (p_linetail);
 
-	      let ns = {lineText: lineText};
+	      let ns = {lineText: lineText, depthChange: depth-pdepth};
 
-              return sequence ([depth-pdepth, ns, cont]);
+	      let stack = cont;
+	      stack.push (ns);
+
+              return stack;
           },
           // linetail =   newline toIndent* -- withContent
           // | newline? end -- withoutContent
@@ -223,9 +226,9 @@ spc = " "
               treeMap.addOperation ('identity(pdepth)', identity_hooks);
               let treeWalker = treeMap (cst);
               // let transpiled = treeWalker ['identity'] ();
-              let transpiled = treeWalker.identity (0);
-              document.getElementById ('output').innerHTML =
-                  transpiled.toString () + '\n';
+              let stack = treeWalker.identity (0);
+	      let text = stack.reverse ().map (item => {return item.lineText;});
+              document.getElementById ('output').innerHTML = text;
           } else {
               document.getElementById ('output').innerHTML = 'FAILED';
           }
