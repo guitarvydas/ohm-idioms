@@ -43,61 +43,62 @@ spc = " "
     <button onclick="identity ()">Generate Identity</button>
     <script src="https://unpkg.com/ohm-js@16/dist/ohm.min.js"></script>
     <script>
-
+      
       function findInNamespace (ns, name) {
-	  return ns [name];
+          return ns [name];
       }
-
+      
       function arrayShallowCopy (a) { console.log (a); return [...a]; }
       
       function getValue (stack, fieldname) {
-	  let stk = arrayShallowCopy (stack);
-	  return agetValue (stk, fieldname);
+          let stk = arrayShallowCopy (stack);
+          return agetValue (stk, fieldname) ();
       }
       
       function agetValue (stk, fieldname) {
-	  console.log (stk);
-	  if (0 >= stk.length) {
-	      throw `field ${fieldname} not found`;
-	  } else {
-	      let firstns = stk.pop ();
-	      console.log (firstns);
-	      let v = findInNamespace (firstns, fieldname);
-	      if (undefined !== v) {
-		  return v;
-	      } else {
-		  return agetValue (stk, fieldname);
-	      }
-	  }
+          console.log (stk);
+          if (0 >= stk.length) {
+              throw `field ${fieldname} not found`;
+          } else {
+              let firstns = stk.pop ();
+              let v = findInNamespace (firstns, fieldname);
+              if (undefined !== v) {
+                  return v;
+              } else {
+                  return agetValue (stk, fieldname);
+              }
+          }
       }
-
-      function sequence (objArray) {
-	  return objArray;
+      
+      function sequence (namespaceArray) {
+          return namespaceArray;
       }
       
       function opt (ohmNode, op) {
-	  // maybe zero (0) matches
-	  if (ohmNode.numChildren > 0) {
-	      return ohmNode [op] ();
-	  } else {
-	      return {};
-	  }
+          // maybe zero (0) matches
+          if (ohmNode.numChildren > 0) {
+              return ohmNode [op] ();
+          } else {
+              return {};
+          }
       }
       
       function kleeneStar (ohmNode, op) {
-	  // maybe zero (0) matches
-	  if (ohmNode.numChildren > 0) {
-	      return ohmNode [op] ();
-	  } else {
-	      return {};
-	  }
+          // maybe zero (0) matches
+          if (ohmNode.numChildren > 0) {
+              return ohmNode [op] ();
+          } else {
+              return {};
+          }
       }
 
-      function kleenePlus (objArray, op) {
-	  // always > 0 matches
-	  return ohmNode [op] ();
+      function kleenePlus (ohmNode, op) {
+          // always > 0 matches
+          return ohmNode [op] ();
       }
 
+      function flatten (a) { return a.flat (1000); }
+      
       let identity_hooks = {
           // bits of action code ("semantics") to hang off
           // like Christmas tree ornaments from the main parse
@@ -108,24 +109,24 @@ spc = " "
           // all of the underlying details have no typos in
           // them...
 
-	  // main = line+
+          // main = line+
           main: function (p_line) {
               let line = p_line.identity ();
-              return kleenePlus (line);
+              return kleenePlus (p_line, 'identity');
           },
-	  // line = indent? spc? toEOL+ linetail
+          // line = indent? spc? toEOL+ linetail
           line: function (p_indent, p_spc, p_toEOL, p_linetail) {
               let indent = opt (p_indent, 'identity');
               let spc = opt (p_spc, 'identity');
               let toEOL = kleeneStar (p_toEOL, 'identity');
               let linetail = p_linetail.identity ();
 
-	      let depth = getValue (indent, 'depth');
+              let depth = getValue (indent, 'depth');
 
               return sequence ([indent, spc, toEOL, linetail]);
           },
-	  // linetail =   newline toIndent* -- withContent
-	  // | newline? end -- withoutContent
+          // linetail =   newline toIndent* -- withContent
+          // | newline? end -- withoutContent
           linetail_withContent: function (p_newline, p_toIndent) {
               let newline = p_newline.identity ();
               let toIndent = kleeneStar (p_toIndent, 'identity');
@@ -137,43 +138,44 @@ spc = " "
               return sequence ([newline, end]);
           },
 
-	  // indent = indentChar+
+          // indent = indentChar+
           indent: function (p_indentChar) {
               let stack = kleeneStar (p_indentChar, 'identity');
-	      stack.push ({ depth: p_indentChar.numChildren }, stack);
-	      return stack;
-	  },
-	  
-	  // indentChar = ("#" | "*")
+              stack.push ({ depth: function () { return p_indentChar.numChildren; }});
+              return stack;
+          },
+          
+          // indentChar = ("#" | "*")
           indentChar: function (p_c) {
-	      let stack = p_c.identity ();
-	      return stack;
+              let stack = p_c.identity ();
+              return stack;
           },
-	  // toIndent = ~indentChar any
+          // toIndent = ~indentChar any
           toIndent: function (p_c) {
-	      let stack = p_c.identity ();
-	      return stack;
+              let stack = p_c.identity ();
+              return stack;
           },
-	  // toEOL = ~newline any
+          // toEOL = ~newline any
           toEOL: function (p_c) {
-	      let stack = p_c.identity ();
-	      return stack;
+              let stack = p_c.identity ();
+              return stack;
           },
-	  // newline = "\n"
+          // newline = "\n"
           newline: function (p_c) {
-	      let stack = p_c.identity ();
-	      return stack;
+              let stack = p_c.identity ();
+              return stack;
           },
-	  // spc = " "
+          // spc = " "
           spc: function (p_c) {
-	      let stack = p_c.identity ();
-	      return stack;
+              let stack = p_c.identity ();
+              return stack;
           },
           _terminal: function () {
-	      return {text: this.sourceString};
+              return {text: this.sourceString};
           },
           _iter: function (...children) { 
-	      return children.map(c => c.identity ()); 
+              let stk =  flatten (children.map(c => c.identity ())); 
+              return stk;
           }
       };
       
@@ -183,38 +185,38 @@ spc = " "
           let g = ohm.grammar (grammarText);
           let matchResult = g.match (src);
           if (matchResult.succeeded ()) {
-	      document.getElementById("status").innerHTML = "OK";
-	      let s = g.createSemantics ();
-	      return [matchResult, s];
+              document.getElementById("status").innerHTML = "OK";
+              let s = g.createSemantics ();
+              return [matchResult, s];
           } else {
-	      document.getElementById("status").innerHTML = "parse FAILED";
-	      let dontcare = null;
-	      return [ matchResult, dontcare ];
+              document.getElementById("status").innerHTML = "parse FAILED";
+              let dontcare = null;
+              return [ matchResult, dontcare ];
           }
       }
 
       function parseTreeToString (p_a) {
           if (typeof p_a === 'string' || p_a instanceof String) {
-	      return p_a;
+              return p_a;
           } else {
-	      let a = p_a.asArray ();
-	      var r = "";
-	      a.forEach (x => { r = r + parseTreeToString (x) + ' '});
-	      return '[' +  parseTreeToString (r.trim ()) + ']';
+              let a = p_a.asArray ();
+              var r = "";
+              a.forEach (x => { r = r + parseTreeToString (x) + ' '});
+              return '[' +  parseTreeToString (r.trim ()) + ']';
           }
       }
       
       function identity () {
           var [cst, treeMap] = parse ();      
           if (cst.succeeded ()) {
-	      treeMap.addOperation ('identity', identity_hooks);
-	      let treeWalker = treeMap (cst);
-	      // let transpiled = treeWalker ['identity'] ();
-	      let transpiled = treeWalker.identity ();
-	      document.getElementById ('output').innerHTML =
-                  transpiled.seep ('indentLength') () + '\n';
+              treeMap.addOperation ('identity', identity_hooks);
+              let treeWalker = treeMap (cst);
+              // let transpiled = treeWalker ['identity'] ();
+              let transpiled = treeWalker.identity ();
+              document.getElementById ('output').innerHTML =
+                  transpiled + '\n';
           } else {
-	      document.getElementById ('output').innerHTML = 'FAILED';
+              document.getElementById ('output').innerHTML = 'FAILED';
           }
       }
 
