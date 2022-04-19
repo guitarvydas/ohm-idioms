@@ -29,11 +29,11 @@ spc = " "
 
     <p>source:</p>
     <textarea id="source" rows="5" cols="90" placeholder="notation test" style="background-color:oldlace;">
-0 1
-# a b
-## c d
+a b
+# c d
 ## e f
-# g h
+## g h
+# i j
     </textarea>
     <p>output:</p>
     <textarea id="output" rows="10" cols="90" placeholder="identity output" style="background-color:oldlace;">
@@ -57,21 +57,21 @@ spc = " "
 	  return [...a];
       }
       
-      function getValue (stack, fieldname) {
+      function getValue (stack, fieldname, defaultValue) {
           let stk = arrayShallowCopy (stack);
-          return agetValue (stk, fieldname) ();
+          return agetValue (stk, fieldname, defaultValue) ();
       }
       
-      function agetValue (stk, fieldname) {
+      function agetValue (stk, fieldname, defaultValue) {
           if (0 >= stk.length) {
-              throw `field ${fieldname} not found`;
+	      return function () { return defaultValue; };
           } else {
               let firstns = stk.pop ();
               let v = findInNamespace (firstns, fieldname);
               if (undefined !== v) {
                   return v;
               } else {
-                  return agetValue (stk, fieldname);
+                  return agetValue (stk, fieldname, defaultValue);
               }
           }
       }
@@ -94,7 +94,7 @@ spc = " "
           if (ohmNode.numChildren > 0) {
               return ohmNode [op] (pdepth);
           } else {
-              return {};
+              return [{}];
           }
       }
 
@@ -131,7 +131,7 @@ spc = " "
               let indent = opt (p_indent, 'identity', pdepth);
               let spc = opt (p_spc, 'identity', pdepth);
               let toEOL = kleeneStar (p_toEOL, 'identity', pdepth);
-              let depth = getValue (indent, 'depth');
+              let depth = getValue (indent, 'depth', 0);
               let linetail = p_linetail.identity (depth);
 	      let cont = p_continuation.identity (depth);
 
@@ -139,7 +139,7 @@ spc = " "
 
 	      let contText;
 	      if (0 < cont.length) {
-		  contText = getValue (cont, 'lineText');
+		  contText = getValue (cont, 'lineText', "");
 	      } else {
 		  contText = "";
 	      }
@@ -245,7 +245,7 @@ spc = " "
               let treeWalker = treeMap (cst);
               // let transpiled = treeWalker ['identity'] ();
               let stack = treeWalker.identity (0);
-	      let text = getValue (stack, 'lineText');
+	      let text = getValue (stack, 'lineText', "");
               document.getElementById ('output').innerHTML = text;
           } else {
               document.getElementById ('output').innerHTML = 'FAILED';
