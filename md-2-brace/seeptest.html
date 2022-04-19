@@ -15,7 +15,7 @@
 MarkDown {
 main = lines
 lines = indent? spc? toEOL+ linetail lines?
-linetail =   newline toIndent* -- withContent
+linetail = | newline toIndent* -- withContent
 | newline? end -- withoutContent
 indent = indentChar+
 indentChar = ("#" | "*")
