@@ -112,19 +112,19 @@ spc = " "
           // them...
 
           // main = lines
-          main: function (p_lines, pdepth) {
-              let line = p_lines.identity (pdepth);
-              return kleenePlus (p_lines, 'identity', pdepth);
+          main: function (p_lines) {
+              let line = p_lines.identity ();
+              return kleenePlus (p_lines, 'identity', this.args.pdepth);
           },
           // lines = indent? spc? toEOL+ linetail lines?
           lines: function (p_indent, p_spc, p_toEOL, p_linetail, p_continuation, pdepth) {
-              let indent = opt (p_indent, 'identity', pdepth);
-              let spc = opt (p_spc, 'identity', pdepth);
-              let toEOL = kleeneStar (p_toEOL, 'identity', pdepth);
-              let linetail = p_linetail.identity (pdepth);
+              let indent = opt (p_indent, 'identity');
+              let spc = opt (p_spc, 'identity');
+              let toEOL = kleeneStar (p_toEOL, 'identity');
+              let linetail = p_linetail.identity );
 	      let prevdepth = this.args.pdepth;
               let depth = getValue (indent, 'depth');
-	      let cont = p_continuation.identity (depth, pdepth);
+	      let cont = p_continuation.identity (depth);
 
               return sequence ([depth,  cont]);
           },
