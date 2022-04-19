@@ -100,6 +100,10 @@ spc = " "
       }
 
       function flatten (a) { return a.flat (1000); }
+
+      function asText (cstNode) {
+	  return cstNode.sourceString;
+      }
       
       let identity_hooks = {
           // bits of action code ("semantics") to hang off
@@ -127,7 +131,11 @@ spc = " "
               let linetail = p_linetail.identity (depth);
 	      let cont = p_continuation.identity (depth);
 
-              return sequence ([depth-pdepth,  cont]);
+	      let lineText = asText (p_spc) + asText (p_toEOL) + asText (p_linetail);
+
+	      let ns = {lineText: lineText};
+
+              return sequence ([depth-pdepth, ns, cont]);
           },
           // linetail =   newline toIndent* -- withContent
           // | newline? end -- withoutContent
