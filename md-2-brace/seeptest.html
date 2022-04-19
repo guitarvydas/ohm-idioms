@@ -29,6 +29,7 @@ spc = " "
 
     <p>source:</p>
     <textarea id="source" rows="5" cols="90" placeholder="notation test" style="background-color:oldlace;">
+0 1
 # a b
 ## c d
 ## e f
@@ -51,7 +52,10 @@ spc = " "
           return ns [name];
       }
       
-      function arrayShallowCopy (a) { return [...a]; }
+      function arrayShallowCopy (a) {
+	  console.log (a);
+	  return [...a];
+      }
       
       function getValue (stack, fieldname) {
           let stk = arrayShallowCopy (stack);
@@ -81,7 +85,7 @@ spc = " "
           if (ohmNode.numChildren > 0) {
               return ohmNode [op] (pdepth);
           } else {
-              return {};
+              return [{}];
           }
       }
       
@@ -141,10 +145,13 @@ spc = " "
 	      }
 
 	      let diff = depth - pdepth;
+	      console.log (diff);
 	      if (0 < diff) {
 		  lineText = "{" + lineText + contText;
 	      } else if (0 > diff) {
 		  lineText = lineText + "}" + contText;
+	      } else {
+		  lineText = lineText + contText;
 	      }
 
 	      let ns = {lineText: function () {return lineText;}, depthChange: function () {return diff;}};
@@ -238,7 +245,7 @@ spc = " "
               let treeWalker = treeMap (cst);
               // let transpiled = treeWalker ['identity'] ();
               let stack = treeWalker.identity (0);
-	      let text = stack.reverse ().map (item => {return item.lineText ();}).join('');
+	      let text = getValue (stack, 'lineText');
               document.getElementById ('output').innerHTML = text;
           } else {
               document.getElementById ('output').innerHTML = 'FAILED';
