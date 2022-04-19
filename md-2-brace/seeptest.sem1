@@ -1,0 +1,7 @@
+indent = indentChar+
+
+indent :  indentLength = *.length
+
+
+// when indent is matched, add a method "indentLength" which is the length of the match
+
