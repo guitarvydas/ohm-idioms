@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <style>
+      textarea {
+      }
+    </style>
+  </head>
+  <body>
+
+    <h1>Markdown Parser and Identity Semantics Workbench 2</h1>
+
+    <p>markdown grammar:</p>
+    <textarea id="grammar" rows="15" cols="90" placeholder="grammar" style="background-color:oldlace">
+MarkDown {
+main = lines
+lines = indent? spc? toEOL+ linetail lines?
+linetail =   newline toIndent* -- withContent
+| newline? end -- withoutContent
+indent = indentChar+
+indentChar = ("#" | "*")
+toIndent = ~indentChar any
+toEOL = ~newline any
+
+newline = "\n"
+spc = " "
+}
+    </textarea>
+
+    <p>source:</p>
+    <textarea id="source" rows="5" cols="90" placeholder="notation test" style="background-color:oldlace;">
+## c d
+## e f
+    </textarea>
+    <p>output:</p>
+    <textarea id="output" rows="5" cols="90" placeholder="identity output" style="background-color:oldlace;">
+    </textarea>
+
+
+    <p id="status" >READY</p>
+
+
+    <br>
+    <button onclick="identity ()">Generate Identity</button>
+    <script src="https://unpkg.com/ohm-js@16/dist/ohm.min.js"></script>
+    <script>
+      
+      function findInNamespace (ns, name) {
+          return ns [name];
+      }
+      
+      function arrayShallowCopy (a) { console.log (a); return [...a]; }
+      
+      function getValue (stack, fieldname) {
+          let stk = arrayShallowCopy (stack);
+          return agetValue (stk, fieldname) ();
+      }
+      
+      function agetValue (stk, fieldname) {
+          console.log (stk);
+          if (0 >= stk.length) {
+              throw `field ${fieldname} not found`;
+          } else {
+              let firstns = stk.pop ();
+              let v = findInNamespace (firstns, fieldname);
+              if (undefined !== v) {
+                  return v;
+              } else {
+                  return agetValue (stk, fieldname);
+              }
+          }
+      }
+      
+      function sequence (namespaceArray) {
+          return namespaceArray;
+      }
+      
+      function opt (ohmNode, op) {
+          // maybe zero (0) matches
+          if (ohmNode.numChildren > 0) {
+              return ohmNode [op] ();
+          } else {
+              return {};
+          }
+      }
+      
+      function kleeneStar (ohmNode, op) {
+          // maybe zero (0) matches
+          if (ohmNode.numChildren > 0) {
+              return ohmNode [op] ();
+          } else {
+              return {};
+          }
+      }
+
+      function kleenePlus (ohmNode, op) {
+          // always > 0 matches
+          return ohmNode [op] ();
+      }
+
+      function flatten (a) { return a.flat (1000); }
+      
+      let identity_hooks = {
+          // bits of action code ("semantics") to hang off
+          // like Christmas tree ornaments from the main parse
+          // tree (an AST which becomes a CST when applied
+          //  to actual input text).
+          // In this case, we just want to perform an identity
+          // transform - output == input, to check that
+          // all of the underlying details have no typos in
+          // them...
+
+          // main = lines
+          main: function (p_lines) {
+              let line = p_lines.identity ();
+              return kleenePlus (p_lines, 'identity');
+          },
+          // lines = indent? spc? toEOL+ linetail lines?
+          lines: function (p_indent, p_spc, p_toEOL, p_linetail, p_continuation) {
+              let indent = opt (p_indent, 'identity');
+              let spc = opt (p_spc, 'identity');
+              let toEOL = kleeneStar (p_toEOL, 'identity');
+              let linetail = p_linetail.identity ();
+              let depth = getValue (indent, 'depth');
+	      let cont = p_continuation.identity ();
+
+              return sequence ([depth, indent, spc, toEOL, linetail, cont]);
+          },
+          // linetail =   newline toIndent* -- withContent
+          // | newline? end -- withoutContent
+          linetail_withContent: function (p_newline, p_toIndent) {
+              let newline = p_newline.identity ();
+              let toIndent = kleeneStar (p_toIndent, 'identity');
+              return sequence ([newline, toIndent]);
+          },
+          linetail_withoutContent: function (p_newline, p_end) {
+              let newline = opt (p_newline, 'identity');
+              let end = p_end.identity ();
+              return sequence ([newline, end]);
+          },
+
+          // indent = indentChar+
+          indent: function (p_indentChar) {
+              let stack = kleeneStar (p_indentChar, 'identity');
+              stack.push ({ depth: function () { return p_indentChar.numChildren; }});
+              return stack;
+          },
+          
+          // indentChar = ("#" | "*")
+          indentChar: function (p_c) {
+              let stack = p_c.identity ();
+              return stack;
+          },
+          // toIndent = ~indentChar any
+          toIndent: function (p_c) {
+              let stack = p_c.identity ();
+              return stack;
+          },
+          // toEOL = ~newline any
+          toEOL: function (p_c) {
+              let stack = p_c.identity ();
+              return stack;
+          },
+          // newline = "\n"
+          newline: function (p_c) {
+              let stack = p_c.identity ();
+              return stack;
+          },
+          // spc = " "
+          spc: function (p_c) {
+              let stack = p_c.identity ();
+              return stack;
+          },
+          _terminal: function () {
+              return {text: this.sourceString};
+          },
+          _iter: function (...children) { 
+              let stk =  flatten (children.map(c => c.identity ())); 
+              return stk;
+          }
+      };
+      
+      function parse () {
+          let grammarText = document.getElementById("grammar").value;
+          let src = document.getElementById("source").value;
+          let g = ohm.grammar (grammarText);
+          let matchResult = g.match (src);
+          if (matchResult.succeeded ()) {
+              document.getElementById("status").innerHTML = "OK";
+              let s = g.createSemantics ();
+              return [matchResult, s];
+          } else {
+              document.getElementById("status").innerHTML = "parse FAILED";
+              let dontcare = null;
+              return [ matchResult, dontcare ];
+          }
+      }
+
+      function identity () {
+          var [cst, treeMap] = parse ();      
+          if (cst.succeeded ()) {
+              treeMap.addOperation ('identity', identity_hooks);
+              let treeWalker = treeMap (cst);
+              // let transpiled = treeWalker ['identity'] ();
+              let transpiled = treeWalker.identity ();
+              document.getElementById ('output').innerHTML =
+                  transpiled.toString () + '\n';
+          } else {
+              document.getElementById ('output').innerHTML = 'FAILED';
+          }
+      }
+
+    </script>
+  </body>
+</html>
+
