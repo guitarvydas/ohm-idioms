@@ -227,7 +227,7 @@ spc = " "
               let treeWalker = treeMap (cst);
               // let transpiled = treeWalker ['identity'] ();
               let stack = treeWalker.identity (0);
-	      let text = stack.reverse ().map (item => {return item.lineText;});
+	      let text = stack.reverse ().map (item => {return item.lineText;}).join('');
               document.getElementById ('output').innerHTML = text;
           } else {
               document.getElementById ('output').innerHTML = 'FAILED';
