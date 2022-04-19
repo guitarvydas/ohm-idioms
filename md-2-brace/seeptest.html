@@ -137,12 +137,7 @@ a b
 
 	      let lineText = asText (p_spc) + asText (p_toEOL) + asText (p_linetail);
 
-	      let contText;
-	      if (0 < cont.length) {
-		  contText = getValue (cont, 'lineText', "");
-	      } else {
-		  contText = "";
-	      }
+	      let contText = getValue (cont, 'lineText', "");
 
 	      let diff = depth - pdepth;
 	      console.log (diff);
