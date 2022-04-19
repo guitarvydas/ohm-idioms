@@ -29,6 +29,7 @@ spc = " "
 
     <p>source:</p>
     <textarea id="source" rows="5" cols="90" placeholder="notation test" style="background-color:oldlace;">
+# a b
 ## c d
 ## e f
     </textarea>
@@ -124,7 +125,7 @@ spc = " "
               let depth = getValue (indent, 'depth');
 	      let cont = p_continuation.identity ();
 
-              return sequence ([depth, indent, spc, toEOL, linetail, cont]);
+              return sequence ([depth,  cont]);
           },
           // linetail =   newline toIndent* -- withContent
           // | newline? end -- withoutContent
