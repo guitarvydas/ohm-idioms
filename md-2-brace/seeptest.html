@@ -13,8 +13,8 @@
     <p>markdown grammar:</p>
     <textarea id="grammar" rows="15" cols="90" placeholder="grammar" style="background-color:oldlace">
 MarkDown {
-main = line+
-line = indent? spc? toEOL+ linetail
+main = lines
+lines = indent? spc? toEOL+ linetail lines?
 linetail =   newline toIndent* -- withContent
 | newline? end -- withoutContent
 indent = indentChar+
@@ -30,6 +30,7 @@ spc = " "
     <p>source:</p>
     <textarea id="source" rows="5" cols="90" placeholder="notation test" style="background-color:oldlace;">
 ## c d
+## e f
     </textarea>
     <p>output:</p>
     <textarea id="output" rows="5" cols="90" placeholder="identity output" style="background-color:oldlace;">
@@ -109,21 +110,21 @@ spc = " "
           // all of the underlying details have no typos in
           // them...
 
-          // main = line+
-          main: function (p_line) {
-              let line = p_line.identity ();
-              return kleenePlus (p_line, 'identity');
+          // main = lines
+          main: function (p_lines) {
+              let line = p_lines.identity ();
+              return kleenePlus (p_lines, 'identity');
           },
-          // line = indent? spc? toEOL+ linetail
-          line: function (p_indent, p_spc, p_toEOL, p_linetail) {
+          // lines = indent? spc? toEOL+ linetail lines?
+          lines: function (p_indent, p_spc, p_toEOL, p_linetail, p_continuation) {
               let indent = opt (p_indent, 'identity');
               let spc = opt (p_spc, 'identity');
               let toEOL = kleeneStar (p_toEOL, 'identity');
               let linetail = p_linetail.identity ();
-
               let depth = getValue (indent, 'depth');
+	      let cont = p_continuation.identity ();
 
-              return sequence ([indent, spc, toEOL, linetail]);
+              return sequence ([depth, indent, spc, toEOL, linetail, cont]);
           },
           // linetail =   newline toIndent* -- withContent
           // | newline? end -- withoutContent
@@ -195,17 +196,6 @@ spc = " "
           }
       }
 
-      function parseTreeToString (p_a) {
-          if (typeof p_a === 'string' || p_a instanceof String) {
-              return p_a;
-          } else {
-              let a = p_a.asArray ();
-              var r = "";
-              a.forEach (x => { r = r + parseTreeToString (x) + ' '});
-              return '[' +  parseTreeToString (r.trim ()) + ']';
-          }
-      }
-      
       function identity () {
           var [cst, treeMap] = parse ();      
           if (cst.succeeded ()) {
@@ -214,7 +204,7 @@ spc = " "
               // let transpiled = treeWalker ['identity'] ();
               let transpiled = treeWalker.identity ();
               document.getElementById ('output').innerHTML =
-                  transpiled + '\n';
+                  transpiled.toString () + '\n';
           } else {
               document.getElementById ('output').innerHTML = 'FAILED';
           }
