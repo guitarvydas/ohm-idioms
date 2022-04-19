@@ -53,7 +53,6 @@ a b
       }
       
       function arrayShallowCopy (a) {
-	  console.log (a);
 	  return [...a];
       }
       
@@ -123,7 +122,28 @@ a b
           main: function (p_lines) {
 	      let pdepth = this.args.pdepth
               let line = p_lines.identity (pdepth);
-              return kleenePlus (p_lines, 'identity', pdepth);
+	      let stack = kleenePlus (p_lines, 'identity', pdepth);
+	      let diff = getValue (stack, 'depthChange', 0);
+	      let lineText = getValue (stack, 'lineText', "");
+	      while (diff !== 0) {
+		  if (diff < 0) {
+		      lineText = lineText + "}";
+		      diff += 1;
+		  } else if (diff > 0) { // can this ever happen?
+		      lineText = "{" + lineText;
+		      diff -= 1;
+		  }
+	      }
+	      return [{lineText: 
+		       function () { 
+			   return lineText; 
+		       }, 
+		       depthChange: 
+		       function () {
+			   return 0;
+		       }
+		      }
+		     ];
           },
           // lines = indent? spc? toEOL+ linetail lines?
           lines: function (p_indent, p_spc, p_toEOL, p_linetail, p_continuation) {
@@ -140,7 +160,6 @@ a b
 	      let contText = getValue (cont, 'lineText', "");
 
 	      let diff = depth - pdepth;
-	      console.log (diff);
 	      if (0 < diff) {
 		  lineText = "{" + lineText + contText;
 	      } else if (0 > diff) {
