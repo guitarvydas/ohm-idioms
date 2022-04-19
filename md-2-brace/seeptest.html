@@ -61,9 +61,18 @@ a b
           return agetValue (stk, fieldname, defaultValue) ();
       }
       
+      function getValueNoDefault (stack, fieldname) {
+          let stk = arrayShallowCopy (stack);
+          return agetValue (stk, fieldname, undefined) ();
+      }
+      
       function agetValue (stk, fieldname, defaultValue) {
           if (0 >= stk.length) {
-	      return function () { return defaultValue; };
+	      if (defaultValue === undefined) {
+		  throw `value not found ${fieldname}`;
+	      } else {
+		  return function () { return defaultValue; };
+	      }
           } else {
               let firstns = stk.pop ();
               let v = findInNamespace (firstns, fieldname);
@@ -121,9 +130,8 @@ a b
           // main = lines
           main: function (p_lines) {
 	      let pdepth = this.args.pdepth
-              let line = p_lines.identity (pdepth);
 	      let stack = kleenePlus (p_lines, 'identity', pdepth);
-	      let diff = getValue (stack, 'depthChange', 0);
+	      let diff = getValueNoDefault (stack, 'depthChange');
 	      let lineText = getValue (stack, 'lineText', "");
 	      while (diff !== 0) {
 		  if (diff < 0) {
