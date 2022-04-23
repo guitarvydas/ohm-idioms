@@ -1,0 +1,6 @@
+Recursion {
+  Main = Primary+ ";" Item
+  Item = Primary Item -- recursive
+       | Primary      -- bottom
+  Primary = alnum
+}

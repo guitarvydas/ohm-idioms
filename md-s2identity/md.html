@@ -57,13 +57,13 @@ spc = " "
       // all of the underlying details have no typos in
       // them...
       main: function (line) {
-	  console.log (`main ${this.args.depth}`);
+          console.log (`main ${this.args.depth}`);
           return [line.identity (9)];
       },
       line: function (indent, spc, toEOL, linetail) {
-	  console.log (`xxxline ${this.args.depth}`);
-	  var d = this.args.depth + 1;
-          return [indent.identity (8), spc.identity (8), toEOL.identity (8), linetail.identity (8)];
+          var d = this.args.depth + 1;
+          return [indent.identity (8), spc.identity (8), toEOL.identity (8), 
+		  linetail.identity (8)];
       },
       linetail_withContent: function (newline, toIndent) {
           return [newline.identity (7), toIndent.identity (7)];
@@ -90,10 +90,10 @@ spc = " "
           return [c.identity (7)];
       },
       _terminal: function () { 
-	  return this.sourceString; 
+          return this.sourceString; 
       },
       _iter: function (...children) { 
-	  return children.map(c => c.identity (7)); 
+          return children.map(c => c.identity (7)); 
       }
   };
 
@@ -105,7 +105,7 @@ spc = " "
       if (matchResult.succeeded ()) {
           document.getElementById("status").innerHTML = "OK";
           let s = g.createSemantics ();
-	  return [matchResult, s];
+          return [matchResult, s];
       } else {
           document.getElementById("status").innerHTML = "parse FAILED";
           let dontcare = null;
@@ -115,24 +115,25 @@ spc = " "
 
   function parseTreeToString (a) {
       if (Array.isArray (a)) {
-	  var r = "";
-	  a.forEach (x => { r = r + parseTreeToString (x) + ' '});
-	  return '[' +  parseTreeToString (r.trim ()) + ']';
+          var r = "";
+          a.forEach (x => { r = r + parseTreeToString (x) + ' '});
+          return '[' +  parseTreeToString (r.trim ()) + ']';
       } else {
-	  return a.toString ();
+          return a.toString ();
       }
   }
   
   function identity () {
       var [cst, treeMap] = parse ();      
       if (cst.succeeded ()) {
-	  treeMap.addOperation ('identity(depth)', identity_hooks);
-	  let treeWalker = treeMap (cst);
-	  // let transpiled = treeWalker ['identity'] ();
-	  let transpiled = treeWalker.identity (0);
-	  document.getElementById ('output').innerHTML = transpiled.flat (1000).join ('');
+          treeMap.addOperation ('identity(depth)', identity_hooks);
+          let treeWalker = treeMap (cst);
+          // let transpiled = treeWalker ['identity'] ();
+          let transpiled = treeWalker.identity (0);
+          document.getElementById ('output').innerHTML = 
+	      transpiled.flat (1000).join ('');
       } else {
-	  document.getElementById ('output').innerHTML = 'FAILED';
+          document.getElementById ('output').innerHTML = 'FAILED';
       }
   }
   

@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <style>
+      textarea {
+      }
+    </style>
+  </head>
+  <body>
+
+    <h1>Hamburger Workbench</h1>
+
+    <p>markdown grammar:</p>
+    <textarea id="grammar" rows="15" cols="90" placeholder="grammar" style="background-color:oldlace">
+hamburger {
+Main = Phrase+
+
+Phrase =
+  | "I" "Want" "A" "Hamburger" "With" Choice* -- phrase0
+  | "I" "Want" "A" "Cheeseburger"             -- phrase1
+  
+Choice = "And"? (Condiment | Extra)
+  
+Condiment =
+ | "Mustard"         -- mustard
+ | "Ketchup"         -- ketchup
+ | "Pickles"         -- pickles
+ | "Special" "Sauce" -- specialsauce
+ 
+Extra =
+ | "Cheese"
+ | "Bacon"
+ 
+}
+    </textarea>
+
+    <p>source:</p>
+    <textarea id="source" rows="7" cols="90" placeholder="input" style="background-color:oldlace;">
+      I Want A Cheeseburger
+      I Want A Hamburger With Cheese And Special Sauce And Ketchup
+    </textarea>
+    <p>output:</p>
+    <textarea id="output" rows="7" cols="90" placeholder="output" style="background-color:oldlace;">
+    </textarea>
+
+
+    <p id="status" >READY</p>
+
+
+    <br>
+    <button onclick="hamburger ()">Hamburger</button>
+    <script src="https://unpkg.com/ohm-js@16/dist/ohm.min.js"></script>
+    <script>
+      let hamburger_hooks = {
+          // bits of action code ("semantics") to hang off
+          // like Christmas tree ornaments from the main parse
+          // tree (an AST which becomes a CST when applied
+          //  to actual input text).
+
+	  Main: function (p) { return p.hamburger ().join ('\n'); },
+          Phrase_phrase0: function (sI, sWant, sA, sHamburger, sWith, choiceArray) {
+              return `kitchen(${choiceArray.hamburger ().map (c => c.content.toString ())});`;
+          },
+          Phrase_phrase1: function (sI, sWant, sA, sCheeseburger) {
+              return "kitchen(99);";
+          },
+          Choice: function (optAnd, thing) {
+              return { content: thing.hamburger ().content };
+          },
+          Condiment_ketchup: function (c) {
+              return { content: "10" };
+          },
+          Condiment_mustard: function (c) {
+              return { content: "11" };
+          },
+          Condiment_pickles: function (c) {
+              return { content: "12" };
+          },
+          Condiment_specialsauce: function (c1, c2) {
+              return { content: "13" };
+          },
+          Extra: function (sAnything) {
+              return { content: "1" };
+          },
+          _terminal: function () {
+              return { content: this.sourceString};
+          },
+          _iter: function (...children) { 
+              let arr = children.map(c => { return c.hamburger ()}); 
+              return arr;
+          }
+      };
+      
+      function parse () {
+          let grammarText = document.getElementById("grammar").value;
+          let src = document.getElementById("source").value;
+          let g = ohm.grammar (grammarText);
+          let matchResult = g.match (src);
+          if (matchResult.succeeded ()) {
+              document.getElementById("status").innerHTML = "OK";
+              let s = g.createSemantics ();
+              return [matchResult, s];
+          } else {
+              document.getElementById("status").innerHTML = "parse FAILED";
+              let dontcare = null;
+              return [ matchResult, dontcare ];
+          }
+      }
+
+      function hamburger () {
+          var [cst, hookMap] = parse ();      
+          if (cst.succeeded ()) {
+              hookMap.addOperation ('hamburger', hamburger_hooks);
+              let treeWalker = hookMap (cst);
+              let text = treeWalker.hamburger ();
+              document.getElementById ('output').innerHTML = text;
+          } else {
+              document.getElementById ('output').innerHTML = 'FAILED';
+          }
+      }
+
+    </script>
+  </body>
+</html>
+

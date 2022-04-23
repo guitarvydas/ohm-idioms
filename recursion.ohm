@@ -1,0 +1,6 @@
+rightRecursion {
+  Main = Item
+  Item = Primary Item -- recursive
+       | Primary      -- bottom
+  Primary = alnum
+}

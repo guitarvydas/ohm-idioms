@@ -8,6 +8,68 @@ textarea {
 </head>
 <body>
 
+<h1>Markdown Parser Workbench</h1>
+
+<p>markdown grammar:</p>
+<textarea id="grammar" rows="15" cols="90" placeholder="grammar" style="background-color:oldlace">
+MarkDown {
+
+main = line+
+line = indent? spc? toEOL+ linetail
+linetail =   newline toIndent* -- withContent
+           | newline? end -- withoutContent
+indent = indentChar+
+indentChar = ("#" | "*")
+toIndent = ~indentChar any
+toEOL = ~newline any
+
+newline = "\n"
+spc = " "
+}
+</textarea>
+
+<p>source:</p>
+<textarea id="source" rows="10" cols="90" placeholder="notation test" style="background-color:oldlace;">
+# a b 
+## c d
+## e f
+</textarea>
+
+
+<p id="status" >READY</p>
+
+
+<br>
+<button onclick="parse ()">Parse</button>
+<script src="https://unpkg.com/ohm-js@16/dist/ohm.min.js"></script>
+<script>
+
+  function parse () {
+      let grammarText = document.getElementById("grammar").value;
+      let src = document.getElementById("source").value;
+      let g = ohm.grammar (grammarText);
+      let r = g.match (src);
+      if (r.succeeded ()) {
+          document.getElementById("status").innerHTML = "OK";
+      } else {
+          document.getElementById("status").innerHTML = "parse FAILED";
+      }
+  }
+  
+  </script>
+</body>
+</html>
+
+<!DOCTYPE html>
+<html>
+<head>
+<style>
+textarea {
+}
+</style>
+</head>
+<body>
+
 <h1>Markdown Parser and Identity Semantics Workbench</h1>
 
 <p>markdown grammar:</p>
@@ -101,7 +163,7 @@ spc = " "
       if (matchResult.succeeded ()) {
           document.getElementById("status").innerHTML = "OK";
           let s = g.createSemantics ();
-	  return [matchResult, s];
+          return [matchResult, s];
       } else {
           document.getElementById("status").innerHTML = "parse FAILED";
           let dontcare = null;
@@ -112,14 +174,14 @@ spc = " "
   function identity () {
       var [cst, treeMap] = parse ();      
       if (cst.succeeded ()) {
-	  treeMap.addOperation ('identity', identity_hooks);
-	  let treeWalker = treeMap (cst);
-	  // let transpiled = treeWalker ['identity'] ();
-	  let transpiled = treeWalker.identity ();
-	  console.log (transpiled.toString ());
-	  document.getElementById ('output').innerHTML = transpiled.toString ();
+          treeMap.addOperation ('identity', identity_hooks);
+          let treeWalker = treeMap (cst);
+          // let transpiled = treeWalker ['identity'] ();
+          let transpiled = treeWalker.identity ();
+          console.log (transpiled.toString ());
+          document.getElementById ('output').innerHTML = transpiled.toString ();
       } else {
-	  document.getElementById ('output').innerHTML = 'FAILED';
+          document.getElementById ('output').innerHTML = 'FAILED';
       }
   }
   
