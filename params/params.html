@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html>
+<head>
+<style>
+textarea {
+}
+</style>
+</head>
+<body>
+
+<h1>Semantic Parameters</h1>
+
+<p>markdown grammar:</p>
+<textarea id="grammar" rows="15" cols="90" placeholder="grammar" style="background-color:oldlace">
+Test {
+main = first second third any*
+first = "A"
+second = "B"
+third = "C"
+}
+</textarea>
+
+<p>source:</p>
+<textarea id="source" rows="5" cols="90" placeholder="notation test" style="background-color:oldlace;">
+ABC
+</textarea>
+<p>output:</p>
+<textarea id="output" rows="5" cols="90" placeholder="notation test" style="background-color:oldlace;">
+</textarea>
+
+<p id="status" >READY</p>
+
+
+<br>
+<button onclick="test ()">ptest</button>
+<script src="https://unpkg.com/ohm-js@16/dist/ohm.min.js"></script>
+<script>
+
+  let hooks = {
+      main: function (first, second, third, junk) {
+          var d = this.args.depth + 1;
+          var rfirst = first.ptest(d+0);
+          var rsecond = second.ptest(d+1);
+          var rthird = third.ptest(d+2);
+	  return [this.args.depth, rfirst, rsecond, rthird];
+      },
+      first: function (c) {
+          return this.args.depth;
+      },
+      second: function (c) {
+          return this.args.depth;
+      },
+      third: function (c) {
+          return this.args.depth;
+      }
+  };
+  
+  function parse () {
+      let grammarText = document.getElementById("grammar").value;
+      let src = document.getElementById("source").value;
+      let g = ohm.grammar (grammarText);
+      let matchResult = g.match (src);
+      if (matchResult.succeeded ()) {
+          document.getElementById("status").innerHTML = "parse OK";
+          let s = g.createSemantics ();
+          return [matchResult, s];
+      } else {
+          document.getElementById("status").innerHTML = "parse FAILED";
+          let dontcare = null;
+          return [ matchResult, dontcare ];
+      }
+  }
+
+  function test () {
+      var [cst, treeMap] = parse ();      
+      if (cst.succeeded ()) {
+          treeMap.addOperation ('ptest(depth)', hooks);
+          let treeWalker = treeMap (cst);
+          let transpiled = treeWalker.ptest (0);
+          document.getElementById ('output').innerHTML = transpiled;
+      } else {
+      }
+  }
+  
+  </script>
+</body>
+</html>
+

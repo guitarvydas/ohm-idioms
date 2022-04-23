@@ -1,0 +1,7 @@
+mdb {
+  braced = 
+    | stuff "{" braced "}" stuff -- nested
+    | stuff                      -- flat
+  stuff = (~"{" ~"}" any)*
+}
+
